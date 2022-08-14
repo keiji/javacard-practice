@@ -43,7 +43,7 @@ public class ApduCommand {
             this.p2 = p2;
         }
 
-        public void write(ByteBuffer byteBuffer) {
+        public void writeTo(ByteBuffer byteBuffer) {
             byteBuffer.put(cla)
                     .put(ins)
                     .put(p1)
@@ -97,7 +97,7 @@ public class ApduCommand {
             }
         }
 
-        public void write(ByteBuffer byteBuffer) {
+        public void writeTo(ByteBuffer byteBuffer) {
             if (lc != null) {
                 byteBuffer.put(lc);
             }
@@ -122,11 +122,11 @@ public class ApduCommand {
         this.body = body;
     }
 
-    public void write(ByteBuffer byteBuffer) {
-        header.write(byteBuffer);
+    public void writeTo(ByteBuffer byteBuffer) {
+        header.writeTo(byteBuffer);
 
         if (body != null) {
-            body.write(byteBuffer);
+            body.writeTo(byteBuffer);
         }
     }
 
