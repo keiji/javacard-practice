@@ -9,7 +9,8 @@ public class ApduResponse {
 
     /**
      * Get data.
-     * String of bytes received in the data field of the response
+     *
+     * @return String of bytes received in the data field of the response
      */
     public byte[] getData() {
         if (rawData.length == 2) {
@@ -22,19 +23,28 @@ public class ApduResponse {
     }
 
     /**
-     * Get status word 1 - Command processing status.
+     * Get status word 1.
+     *
+     * @return Command processing status.
      */
     public int getStatusWord1() {
         return Utils.convertByteToInt(rawData[rawData.length - 2]);
     }
 
     /**
-     * Get status word 2 - Command processing qualifier.
+     * Get status word 2.
+     *
+     * @return Command processing qualifier
      */
     public int getStatusWord2() {
         return Utils.convertByteToInt(rawData[rawData.length - 1]);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param rawData the rawData of APDU response
+     */
     public ApduResponse(byte[] rawData) {
         if (rawData == null) {
             throw new IllegalArgumentException("`rawData` must not be null.");

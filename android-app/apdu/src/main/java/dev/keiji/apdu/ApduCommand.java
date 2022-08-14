@@ -36,6 +36,14 @@ public class ApduCommand {
          */
         public final byte p2;
 
+        /**
+         * Constructor.
+         *
+         * @param cla Class of instruction
+         * @param ins Instruction code
+         * @param p1  Instruction parameter 1
+         * @param p2  Instruction parameter 2
+         */
         public Header(int cla, int ins, int p1, int p2) {
             this.cla = Utils.convertIntToByte(cla);
             this.ins = Utils.convertIntToByte(ins);
@@ -43,10 +51,20 @@ public class ApduCommand {
             this.p2 = Utils.convertIntToByte(p2);
         }
 
+        /**
+         * Number of bytes of the header.
+         *
+         * @return Returns the number of bytes of the header
+         */
         public int size() {
             return 4;
         }
 
+        /**
+         * Write this object to the given ByteBuffer.
+         *
+         * @param byteBuffer The ByteBuffer to which this object should output
+         */
         public void writeTo(ByteBuffer byteBuffer) {
             byteBuffer.put(cla)
                     .put(ins)
@@ -77,6 +95,12 @@ public class ApduCommand {
          */
         public final byte[] le;
 
+        /**
+         * Constructor.
+         *
+         * @param data String of bytes sent in the data field of the command
+         * @param ne   Maximum number of bytes expected in the data field of the response to the command
+         */
         public Body(byte[] data, Integer ne) {
             if (data == null && ne == null) {
                 throw new IllegalArgumentException("Either `data` or `ne` must not be null.");
@@ -101,6 +125,11 @@ public class ApduCommand {
             }
         }
 
+        /**
+         * Number of bytes of the body.
+         *
+         * @return Returns the number of bytes of the body
+         */
         public int size() {
             int size = 0;
             if (lc != null) {
@@ -115,6 +144,11 @@ public class ApduCommand {
             return size;
         }
 
+        /**
+         * Write this object to the given ByteBuffer.
+         *
+         * @param byteBuffer The ByteBuffer to which this object should output
+         */
         public void writeTo(ByteBuffer byteBuffer) {
             if (lc != null) {
                 byteBuffer.put(lc);
@@ -128,9 +162,22 @@ public class ApduCommand {
         }
     }
 
+    /**
+     * Header(mandatory).
+     */
     public final Header header;
+
+    /**
+     * Body(optional).
+     */
     public final Body body;
 
+    /**
+     * Constructor.
+     *
+     * @param header Mandatory header
+     * @param body   Conditional body
+     */
     ApduCommand(Header header, Body body) {
         if (header == null) {
             throw new IllegalArgumentException("`header` must not be null.");
@@ -140,6 +187,11 @@ public class ApduCommand {
         this.body = body;
     }
 
+    /**
+     * Number of bytes of the command.
+     *
+     * @return Returns the number of bytes of the command
+     */
     public int size() {
         if (body != null) {
             return header.size() + body.size();
@@ -148,6 +200,11 @@ public class ApduCommand {
         return header.size();
     }
 
+    /**
+     * Write this object to the given ByteBuffer.
+     *
+     * @param byteBuffer The ByteBuffer to which this object should output
+     */
     public void writeTo(ByteBuffer byteBuffer) {
         header.writeTo(byteBuffer);
 
@@ -161,11 +218,11 @@ public class ApduCommand {
      * Command data: No data
      * Expected response data: No data
      *
-     * @param cla
-     * @param ins
-     * @param p1
-     * @param p2
-     * @return
+     * @param cla Class of instruction
+     * @param ins Instruction code
+     * @param p1  Instruction parameter 1
+     * @param p2  Instruction parameter 2
+     * @return ApduCommand object
      */
     public static ApduCommand createCase1(int cla, int ins, int p1, int p2) {
         return new ApduCommand(new Header(cla, ins, p1, p2), null);
@@ -176,12 +233,12 @@ public class ApduCommand {
      * Command data: No data
      * Expected response data: Data
      *
-     * @param cla
-     * @param ins
-     * @param p1
-     * @param p2
-     * @param ne
-     * @return
+     * @param cla Class of instruction
+     * @param ins Instruction code
+     * @param p1  Instruction parameter 1
+     * @param p2  Instruction parameter 2
+     * @param ne  Number of bytes present in the data field of the command
+     * @return ApduCommand object
      */
     public static ApduCommand createCase2(int cla, int ins, int p1, int p2, int ne) {
         return new ApduCommand(new Header(cla, ins, p1, p2), new Body(null, ne));
@@ -192,12 +249,12 @@ public class ApduCommand {
      * Command data: Data
      * Expected response data: No data
      *
-     * @param cla
-     * @param ins
-     * @param p1
-     * @param p2
-     * @param data
-     * @return
+     * @param cla  Class of instruction
+     * @param ins  Instruction code
+     * @param p1   Instruction parameter 1
+     * @param p2   Instruction parameter 2
+     * @param data String of bytes sent in the data field of the command
+     * @return ApduCommand object
      */
     public static ApduCommand createCase3(int cla, int ins, int p1, int p2, byte[] data) {
         return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, null));
@@ -208,13 +265,13 @@ public class ApduCommand {
      * Command data: Data
      * Expected response data: Data
      *
-     * @param cla
-     * @param ins
-     * @param p1
-     * @param p2
-     * @param data
-     * @param ne
-     * @return
+     * @param cla  Class of instruction
+     * @param ins  Instruction code
+     * @param p1   Instruction parameter 1
+     * @param p2   Instruction parameter 2
+     * @param data String of bytes sent in the data field of the command.
+     * @param ne   Maximum number of bytes expected in the data field of the response to the command
+     * @return ApduCommand object
      */
     public static ApduCommand createCase4(int cla, int ins, int p1, int p2, byte[] data, int ne) {
         return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, ne));
