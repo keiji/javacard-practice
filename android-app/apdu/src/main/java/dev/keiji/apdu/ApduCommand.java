@@ -85,7 +85,7 @@ public class ApduCommand {
                 throw new IllegalArgumentException("`data` size must be less or equal than " + MAX_LC_LENGTH + " bytes.");
             } else {
                 this.data = data;
-                this.lc = integerToByteArrayForLcOrLe(data.length);
+                this.lc = Utils.integerToByteArrayForLcOrLe(data.length);
             }
 
             if (le == null) {
@@ -93,7 +93,7 @@ public class ApduCommand {
             } else if (le > MAX_LE_LENGTH) {
                 throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_LENGTH + " bytes.");
             } else {
-                this.le = integerToByteArrayForLcOrLe(le);
+                this.le = Utils.integerToByteArrayForLcOrLe(le);
             }
         }
 
@@ -192,42 +192,5 @@ public class ApduCommand {
      */
     public static ApduCommand createCase4(byte cla, byte ins, byte p1, byte p2, byte[] data, int le) {
         return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, le));
-    }
-
-    private static final int FILTER_GREATER_1BYTE = 0xFFFFFF00;
-    private static final int FILTER_1ST_BYTE = 0x000000FF;
-    private static final int FILTER_2ND_BYTE = 0x0000FF00;
-    private static final int FILTER_3RD_BYTE = 0x00FF0000;
-    private static final int FILTER_4TH_BYTE = 0xFF000000;
-
-    static int calcByteArraySizeForLcOrLe(int value) {
-        if ((value & FILTER_4TH_BYTE) != 0) {
-            throw new IllegalArgumentException("`value` must be less or equals 3 bytes.");
-        }
-
-        if ((value & FILTER_GREATER_1BYTE) == 0) {
-            return 1;
-        } else {
-            return 3;
-        }
-    }
-
-    static byte[] integerToByteArrayForLcOrLe(int value) {
-        if ((value & FILTER_4TH_BYTE) != 0) {
-            throw new IllegalArgumentException("`value` must be less or equals 3 bytes.");
-        }
-
-        int resultArraySize = calcByteArraySizeForLcOrLe(value);
-        if (resultArraySize == 1) {
-            byte[] result = new byte[1];
-            result[0] = (byte) value;
-            return result;
-        } else {
-            byte[] result = new byte[3];
-            result[0] = (byte) (value & FILTER_1ST_BYTE);
-            result[1] = (byte) ((value & FILTER_2ND_BYTE) >> 8);
-            result[2] = (byte) ((value & FILTER_3RD_BYTE) >> 16);
-            return result;
-        }
     }
 }
