@@ -82,7 +82,7 @@ public class ApduCommand {
                 this.data = null;
                 this.lc = null;
             } else if (data.length > MAX_LC_LENGTH) {
-                throw new IllegalArgumentException("`data` size must be less or equal than " + MAX_LC_LENGTH);
+                throw new IllegalArgumentException("`data` size must be less or equal than " + MAX_LC_LENGTH + " bytes.");
             } else {
                 this.data = data;
                 this.lc = integerToByteArrayForLcOrLe(data.length);
@@ -91,7 +91,7 @@ public class ApduCommand {
             if (le == null) {
                 this.le = null;
             } else if (le > MAX_LE_LENGTH) {
-                throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_LENGTH);
+                throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_LENGTH + " bytes.");
             } else {
                 this.le = integerToByteArrayForLcOrLe(le);
             }
