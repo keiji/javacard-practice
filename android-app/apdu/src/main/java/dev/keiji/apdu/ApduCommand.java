@@ -55,6 +55,8 @@ public class ApduCommand {
      * Conditional body.
      */
     public static class Body {
+        private static final int MAX_LC_LENGTH = 0x00FFFFFF;
+        private static final int MAX_LE_LENGTH = 0x00FFFFFF;
 
         /**
          * Number of bytes present in the data field of the command.
@@ -79,6 +81,8 @@ public class ApduCommand {
             if (data == null) {
                 this.data = null;
                 this.lc = null;
+            } else if (data.length > MAX_LC_LENGTH) {
+                throw new IllegalArgumentException("`data` size must be less or equal than " + MAX_LC_LENGTH);
             } else {
                 this.data = data;
                 this.lc = integerToByteArrayForLcOrLe(data.length);
@@ -86,6 +90,8 @@ public class ApduCommand {
 
             if (le == null) {
                 this.le = null;
+            } else if (le > MAX_LE_LENGTH) {
+                throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_LENGTH);
             } else {
                 this.le = integerToByteArrayForLcOrLe(le);
             }

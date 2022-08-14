@@ -39,6 +39,9 @@ public class ApduResponse {
         if (rawData == null) {
             throw new IllegalArgumentException("`rawData` must not be null.");
         }
+        if (rawData.length < 2) {
+            throw new IllegalArgumentException("`rawData` length must be greater or equal 2.");
+        }
         this.rawData = rawData;
     }
 }
