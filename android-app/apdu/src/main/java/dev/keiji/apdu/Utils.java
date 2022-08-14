@@ -1,6 +1,6 @@
 package dev.keiji.apdu;
 
-class Utils {
+final class Utils {
     private static final int FILTER_GREATER_1BYTE = 0xFFFFFF00;
     private static final int FILTER_1ST_BYTE = 0x000000FF;
     private static final int FILTER_2ND_BYTE = 0x0000FF00;
@@ -39,5 +39,9 @@ class Utils {
             result[2] = (byte) ((value & FILTER_3RD_BYTE) >> 16);
             return result;
         }
+    }
+
+    public static int convertByteToInt(byte value) {
+        return ((int) value) & FILTER_1ST_BYTE;
     }
 }

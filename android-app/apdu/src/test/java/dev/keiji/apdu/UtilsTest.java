@@ -2,6 +2,7 @@ package dev.keiji.apdu;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Assertions;
@@ -102,5 +103,33 @@ public class UtilsTest {
         } catch (IllegalArgumentException exception) {
             System.out.println(exception);
         }
+    }
+
+    @Test
+    public void convertByteToIntTest1() {
+        int expected = 0;
+        byte value = 0;
+        int actual = Utils.convertByteToInt(value);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void convertByteToIntTest2() {
+        int expected = 1;
+        byte value = 1;
+        int actual = Utils.convertByteToInt(value);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void convertByteToIntTest3() {
+        int expected = 0xFF;
+        byte value = (byte) 0xFF;
+
+        int actual1 = value;
+        assertNotEquals(expected, actual1);
+
+        int actual2 = Utils.convertByteToInt(value);
+        assertEquals(expected, actual2);
     }
 }

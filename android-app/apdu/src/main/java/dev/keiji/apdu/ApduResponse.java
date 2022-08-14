@@ -22,17 +22,17 @@ public class ApduResponse {
     }
 
     /**
-     * Get status byte 1 - Command processing status.
+     * Get status word 1 - Command processing status.
      */
-    public byte getStatusWord1() {
-        return rawData[rawData.length - 1];
+    public int getStatusWord1() {
+        return Utils.convertByteToInt(rawData[rawData.length - 1]);
     }
 
     /**
-     * Get status byte 2 - Command processing qualifier.
+     * Get status word 2 - Command processing qualifier.
      */
-    public byte getStatusWord2() {
-        return rawData[rawData.length];
+    public int getStatusWord2() {
+        return Utils.convertByteToInt(rawData[rawData.length]);
     }
 
     public ApduResponse(byte[] rawData) {
