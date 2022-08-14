@@ -7,12 +7,17 @@ final class Utils {
     private static final int FILTER_3RD_BYTE = 0x00FF0000;
     private static final int FILTER_4TH_BYTE = 0xFF000000;
 
+    private static final int MAX_LC_OR_LE_VALUE = 0x0000FFFF; // 65535
+
     private Utils() {
     }
 
     static int calcByteArraySizeForLcOrLe(int value) {
         if ((value & FILTER_4TH_BYTE) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals 3 bytes.");
+        }
+        if (value > MAX_LC_OR_LE_VALUE) {
+            throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
         }
 
         if ((value & FILTER_GREATER_1BYTE) == 0) {
@@ -25,6 +30,9 @@ final class Utils {
     static byte[] integerToByteArrayForLcOrLe(int value) {
         if ((value & FILTER_4TH_BYTE) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals 3 bytes.");
+        }
+        if (value > MAX_LC_OR_LE_VALUE) {
+            throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
         }
 
         int resultArraySize = calcByteArraySizeForLcOrLe(value);
@@ -43,5 +51,14 @@ final class Utils {
 
     public static int convertByteToInt(byte value) {
         return ((int) value) & FILTER_1ST_BYTE;
+    }
+
+    public static byte convertIntToByte(int value) {
+        if ((value & FILTER_GREATER_1BYTE) != 0) {
+            throw new IllegalArgumentException("`value` must be less or equals 1 byte.");
+        }
+
+        return (byte) (value & FILTER_1ST_BYTE);
+
     }
 }

@@ -30,12 +30,22 @@ public class UtilsTest {
 
     @Test
     public void calcByteArraySizeForLcOrLeTest4() {
-        int size = Utils.calcByteArraySizeForLcOrLe(0x00_FFFFFF);
+        int size = Utils.calcByteArraySizeForLcOrLe(0x00_00FFFF);
         Assertions.assertEquals(3, size);
     }
 
     @Test
     public void calcByteArraySizeForLcOrLeTest5() {
+        try {
+            int size = Utils.calcByteArraySizeForLcOrLe(0x00_01FFFF);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void calcByteArraySizeForLcOrLeTest6() {
         try {
             int size = Utils.calcByteArraySizeForLcOrLe(0x01_000000);
             fail();
@@ -45,7 +55,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void calcByteArraySizeForLcOrLeTest6() {
+    public void calcByteArraySizeForLcOrLeTest7() {
         try {
             int size = Utils.calcByteArraySizeForLcOrLe(0xFF_FFFFFF);
             fail();
@@ -78,15 +88,25 @@ public class UtilsTest {
     }
 
     @Test
-    public void integerToByteArrayForLcOrLeTes4() {
-        byte[] expected = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
-        byte[] result = Utils.integerToByteArrayForLcOrLe(0x00_FFFFFF);
+    public void integerToByteArrayForLcOrLeTest4() {
+        byte[] expected = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0x00};
+        byte[] result = Utils.integerToByteArrayForLcOrLe(0x00_00FFFF);
         assertEquals(3, result.length);
         assertArrayEquals(expected, result);
     }
 
     @Test
-    public void integerToByteArrayForLcOrLeTes5() {
+    public void integerToByteArrayForLcOrLeTest5() {
+        try {
+            byte[] result = Utils.integerToByteArrayForLcOrLe(0x00_01FFFF);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void integerToByteArrayForLcOrLeTest6() {
         try {
             byte[] result = Utils.integerToByteArrayForLcOrLe(0x01_FFFFFF);
             fail();
@@ -96,7 +116,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void integerToByteArrayForLcOrLeTes6() {
+    public void integerToByteArrayForLcOrLeTest7() {
         try {
             byte[] result = Utils.integerToByteArrayForLcOrLe(0xFF_FFFFFF);
             fail();

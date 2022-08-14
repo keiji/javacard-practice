@@ -36,11 +36,15 @@ public class ApduCommand {
          */
         public final byte p2;
 
-        public Header(byte cla, byte ins, byte p1, byte p2) {
-            this.cla = cla;
-            this.ins = ins;
-            this.p1 = p1;
-            this.p2 = p2;
+        public Header(int cla, int ins, int p1, int p2) {
+            this.cla = Utils.convertIntToByte(cla);
+            this.ins = Utils.convertIntToByte(ins);
+            this.p1 = Utils.convertIntToByte(p1);
+            this.p2 = Utils.convertIntToByte(p2);
+        }
+
+        public int size() {
+            return 4;
         }
 
         public void writeTo(ByteBuffer byteBuffer) {
@@ -73,9 +77,9 @@ public class ApduCommand {
          */
         public final byte[] le;
 
-        public Body(byte[] data, Integer le) {
-            if (data == null && le == null) {
-                throw new IllegalArgumentException("Either `data` or `le` must not be null.");
+        public Body(byte[] data, Integer ne) {
+            if (data == null && ne == null) {
+                throw new IllegalArgumentException("Either `data` or `ne` must not be null.");
             }
 
             if (data == null) {
@@ -88,13 +92,27 @@ public class ApduCommand {
                 this.lc = Utils.integerToByteArrayForLcOrLe(data.length);
             }
 
-            if (le == null) {
+            if (ne == null) {
                 this.le = null;
-            } else if (le > MAX_LE_LENGTH) {
-                throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_LENGTH + " bytes.");
+            } else if (ne > MAX_LE_LENGTH) {
+                throw new IllegalArgumentException("`ne` must be less or equal than " + MAX_LE_LENGTH + " bytes.");
             } else {
-                this.le = Utils.integerToByteArrayForLcOrLe(le);
+                this.le = Utils.integerToByteArrayForLcOrLe(ne);
             }
+        }
+
+        public int size() {
+            int size = 0;
+            if (lc != null) {
+                size += lc.length;
+            }
+            if (data != null) {
+                size += data.length;
+            }
+            if (le != null) {
+                size += le.length;
+            }
+            return size;
         }
 
         public void writeTo(ByteBuffer byteBuffer) {
@@ -122,6 +140,14 @@ public class ApduCommand {
         this.body = body;
     }
 
+    public int size() {
+        if (body != null) {
+            return header.size() + body.size();
+        }
+
+        return header.size();
+    }
+
     public void writeTo(ByteBuffer byteBuffer) {
         header.writeTo(byteBuffer);
 
@@ -141,7 +167,7 @@ public class ApduCommand {
      * @param p2
      * @return
      */
-    public static ApduCommand createCase1(byte cla, byte ins, byte p1, byte p2) {
+    public static ApduCommand createCase1(int cla, int ins, int p1, int p2) {
         return new ApduCommand(new Header(cla, ins, p1, p2), null);
     }
 
@@ -154,11 +180,11 @@ public class ApduCommand {
      * @param ins
      * @param p1
      * @param p2
-     * @param le
+     * @param ne
      * @return
      */
-    public static ApduCommand createCase2(byte cla, byte ins, byte p1, byte p2, int le) {
-        return new ApduCommand(new Header(cla, ins, p1, p2), new Body(null, le));
+    public static ApduCommand createCase2(int cla, int ins, int p1, int p2, int ne) {
+        return new ApduCommand(new Header(cla, ins, p1, p2), new Body(null, ne));
     }
 
     /**
@@ -173,7 +199,7 @@ public class ApduCommand {
      * @param data
      * @return
      */
-    public static ApduCommand createCase3(byte cla, byte ins, byte p1, byte p2, byte[] data) {
+    public static ApduCommand createCase3(int cla, int ins, int p1, int p2, byte[] data) {
         return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, null));
     }
 
@@ -187,10 +213,10 @@ public class ApduCommand {
      * @param p1
      * @param p2
      * @param data
-     * @param le
+     * @param ne
      * @return
      */
-    public static ApduCommand createCase4(byte cla, byte ins, byte p1, byte p2, byte[] data, int le) {
-        return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, le));
+    public static ApduCommand createCase4(int cla, int ins, int p1, int p2, byte[] data, int ne) {
+        return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, ne));
     }
 }

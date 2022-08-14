@@ -25,14 +25,14 @@ public class ApduResponse {
      * Get status word 1 - Command processing status.
      */
     public int getStatusWord1() {
-        return Utils.convertByteToInt(rawData[rawData.length - 1]);
+        return Utils.convertByteToInt(rawData[rawData.length - 2]);
     }
 
     /**
      * Get status word 2 - Command processing qualifier.
      */
     public int getStatusWord2() {
-        return Utils.convertByteToInt(rawData[rawData.length]);
+        return Utils.convertByteToInt(rawData[rawData.length - 1]);
     }
 
     public ApduResponse(byte[] rawData) {
