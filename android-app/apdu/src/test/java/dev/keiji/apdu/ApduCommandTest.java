@@ -1,0 +1,242 @@
+package dev.keiji.apdu;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Random;
+
+public class ApduCommandTest {
+
+    private final Random rand = new Random(System.currentTimeMillis());
+
+    @Test
+    public void createCase1Test1() {
+        byte[] expected = new byte[]{0x01, 0x02, 0x03, 0x04};
+
+        int expectedSize = 4;
+
+        ApduCommand apduCommand = ApduCommand.createCase1(0x01, 0x02, 0x03, 0x04);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void createCase2Test1() {
+        byte[] expected = new byte[]{0x01, 0x02, 0x03, 0x04, (byte) 0xFF};
+
+        int expectedSize = 4 + 1;
+
+        ApduCommand apduCommand = ApduCommand.createCase2(0x01, 0x02, 0x03, 0x04, 0xFF);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void createCase3Test1() throws IOException {
+        byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
+        byte[] dataSize = new byte[]{(byte) 0xFF}; // 255
+        byte[] data = new byte[255];
+        rand.nextBytes(data);
+
+        int expectedSize = 4 + 1 + 255;
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(header);
+        expected.write(dataSize);
+        expected.write(data);
+        byte[] expectedByteArray = expected.toByteArray();
+
+        ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expectedByteArray, actual);
+    }
+
+    @Test
+    public void createCase3Test2() throws IOException {
+        byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
+        byte[] dataSize = new byte[]{0x00, 0x01, 0x00}; // 256
+        byte[] data = new byte[256];
+        rand.nextBytes(data);
+
+        int expectedSize = 4 + 3 + 256;
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(header);
+        expected.write(dataSize);
+        expected.write(data);
+        byte[] expectedByteArray = expected.toByteArray();
+
+        ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expectedByteArray, actual);
+    }
+
+    @Test
+    public void createCase3Test3() throws IOException {
+        byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
+        byte[] dataSize = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0x00}; // 65,535
+        byte[] data = new byte[0x00_00FFFF];
+        rand.nextBytes(data);
+
+        int expectedSize = 4 + 3 + 65535;
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(header);
+        expected.write(dataSize);
+        expected.write(data);
+        byte[] expectedByteArray = expected.toByteArray();
+
+        ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expectedByteArray, actual);
+    }
+
+    @Test
+    public void createCase3Test4() {
+        byte[] data = new byte[0x00_01FFFF];
+        rand.nextBytes(data);
+
+        try {
+            ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+
+    @Test
+    public void createCase4Test1() throws IOException {
+        byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
+        byte[] dataSize = new byte[]{(byte) 0xFF}; // 255
+        byte[] data = new byte[255];
+        rand.nextBytes(data);
+
+        byte[] le = new byte[]{0x01};
+
+        int expectedSize = 4 + 1 + 255 + 1;
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(header);
+        expected.write(dataSize);
+        expected.write(data);
+        expected.write(le);
+        byte[] expectedByteArray = expected.toByteArray();
+
+        ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0x1);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expectedByteArray, actual);
+    }
+
+    @Test
+    public void createCase4Test2() throws IOException {
+        byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
+        byte[] dataSize = new byte[]{0x00, 0x01, 0x00}; // 256
+        byte[] data = new byte[256];
+        rand.nextBytes(data);
+
+        byte[] le = new byte[]{(byte) 0x00, 0x01, 0x00}; // 256
+
+        int expectedSize = 4 + 3 + 256 + 3;
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(header);
+        expected.write(dataSize);
+        expected.write(data);
+        expected.write(le);
+        byte[] expectedByteArray = expected.toByteArray();
+
+        ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0x0100);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expectedByteArray, actual);
+    }
+
+    @Test
+    public void createCase4Test3() throws IOException {
+        byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
+        byte[] dataSize = new byte[]{0x00, 0x01, 0x00}; // 256
+        byte[] data = new byte[256];
+        rand.nextBytes(data);
+
+        byte[] le = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0x00}; // 65,535
+
+        int expectedSize = 4 + 3 + 256 + 3;
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(header);
+        expected.write(dataSize);
+        expected.write(data);
+        expected.write(le);
+        byte[] expectedByteArray = expected.toByteArray();
+
+        ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0xFFFF);
+        int actualSize = apduCommand.size();
+        assertEquals(expectedSize, actualSize);
+
+        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
+        apduCommand.writeTo(bb);
+        byte[] actual = bb.array();
+
+        assertArrayEquals(expectedByteArray, actual);
+    }
+
+    @Test
+    public void createCase4Test4() {
+        byte[] data = new byte[256];
+
+        try {
+            ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0x010000);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+}
