@@ -77,8 +77,8 @@ public class ApduCommand {
      * Conditional body.
      */
     public static class Body {
-        private static final int MAX_LC_LENGTH = 0x00FFFFFF;
-        private static final int MAX_LE_LENGTH = 0x00FFFFFF;
+        private static final int MAX_LC_LENGTH = 0x0000FFFF;
+        private static final int MAX_LE_LENGTH = 0x0000FFFF;
 
         /**
          * Number of bytes present in the data field of the command.
