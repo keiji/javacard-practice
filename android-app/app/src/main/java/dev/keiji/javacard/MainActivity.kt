@@ -8,22 +8,34 @@ import android.content.IntentFilter
 import android.nfc.NfcAdapter
 import android.nfc.NfcManager
 import android.nfc.Tag
+import android.nfc.TagLostException
 import android.nfc.tech.NfcA
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import dev.keiji.apdu.ApduCommand
+import dev.keiji.apdu.ApduResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.nio.ByteBuffer
 
 class MainActivity : AppCompatActivity() {
     companion object {
+        private val TAG: String = MainActivity::class.java.simpleName
+
         private const val REQUEST_CODE_ENABLE_FOREGROUND_DISPATCH = 0x01
 
         private val INTENT_FILTER = IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED)
+        private val TECH_LIST_ARRAY =
+            arrayOf(
+                arrayOf<String>(NfcA::class.java.name),
+//                arrayOf<String>(NfcB::class.java.name)
+            )
     }
 
     private lateinit var buttonStartReader: Button
@@ -57,12 +69,11 @@ class MainActivity : AppCompatActivity() {
             REQUEST_CODE_ENABLE_FOREGROUND_DISPATCH
         )
 
-        val techListsArray = arrayOf(arrayOf<String>(NfcA::class.java.name))
         nfcAdapter.enableForegroundDispatch(
             this,
             pendingIntent,
             arrayOf(INTENT_FILTER),
-            techListsArray
+            TECH_LIST_ARRAY
         )
 
         lifecycleScope.launch(Dispatchers.Main) {
@@ -97,8 +108,8 @@ class MainActivity : AppCompatActivity() {
         nfcAdapter.disableForegroundDispatch(this)
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
 
         stopForegroundDispatch()
 
@@ -117,8 +128,64 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.Main) {
             setStatusText("onNewIntent Card detected: ${id.toHex(":")}")
+
+            val card = NfcA.get(tag)
+            try {
+                val apduResponse = select(
+                    card,
+                    byteArrayOf(
+                        0x01,
+                        0x01,
+                        0x01,
+                        0x01,
+                        0x01,
+                        0x01,
+                        0x01
+                    )
+                )
+                setStatusText("apduResponse: ${apduResponse.statusWord1}, ${apduResponse.statusWord2}")
+            } catch (exception: TagLostException) {
+                setStatusText("exception: ${exception.message}")
+            }
+
         }
     }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun select(card: NfcA, data: ByteArray): ApduResponse =
+        withContext(Dispatchers.IO) {
+            card.connect()
+
+            Log.d(TAG, "connected")
+
+            // Dummy command
+            val apduCommand = ApduCommand.createCase3(
+                0x00, 0xA4, 0x04, 0x0C,
+                data, false
+            )
+            val bb = ByteBuffer.allocate(apduCommand.size()).also {
+                apduCommand.writeTo(it)
+            }
+
+            val sendData = bb.let {
+                it.rewind()
+                it.array()
+            }
+
+            Log.d(TAG, "transceive ready ${sendData.toHex(":")}")
+
+            val responseBytes = card.transceive(sendData)
+
+            Log.d(TAG, "transceived ${responseBytes}")
+
+            val apduResponse = ApduResponse(responseBytes)
+
+            bb.clear()
+
+            card.close()
+
+            return@withContext apduResponse
+        }
 
     private suspend fun setStatusText(text: String) = withContext(Dispatchers.Main) {
         status.text = text
