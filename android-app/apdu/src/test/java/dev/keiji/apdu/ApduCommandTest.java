@@ -38,7 +38,10 @@ public class ApduCommandTest {
 
         int expectedSize = 4 + 1;
 
-        ApduCommand apduCommand = ApduCommand.createCase2(0x01, 0x02, 0x03, 0x04, 0xFF);
+        ApduCommand apduCommand = ApduCommand.createCase2(
+                0x01, 0x02, 0x03, 0x04,
+                0xFF, false
+        );
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
@@ -64,7 +67,10 @@ public class ApduCommandTest {
         expected.write(data);
         byte[] expectedByteArray = expected.toByteArray();
 
-        ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+        ApduCommand apduCommand = ApduCommand.createCase3(
+                0x01, 0x02, 0x03, 0x04,
+                data, false
+        );
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
@@ -90,7 +96,10 @@ public class ApduCommandTest {
         expected.write(data);
         byte[] expectedByteArray = expected.toByteArray();
 
-        ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+        ApduCommand apduCommand = ApduCommand.createCase3(
+                0x01, 0x02, 0x03, 0x04,
+                data, true
+        );
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
@@ -116,7 +125,10 @@ public class ApduCommandTest {
         expected.write(data);
         byte[] expectedByteArray = expected.toByteArray();
 
-        ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+        ApduCommand apduCommand = ApduCommand.createCase3(
+                0x01, 0x02, 0x03, 0x04,
+                data, true
+        );
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
@@ -128,12 +140,31 @@ public class ApduCommandTest {
     }
 
     @Test
-    public void createCase3Test4() {
+    public void createCase3TestException1() {
+        byte[] data = new byte[0x00_00FFFF];
+        rand.nextBytes(data);
+
+        try {
+            ApduCommand apduCommand = ApduCommand.createCase3(
+                    0x01, 0x02, 0x03, 0x04,
+                    data, false
+            );
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void createCase3TestException2() {
         byte[] data = new byte[0x00_01FFFF];
         rand.nextBytes(data);
 
         try {
-            ApduCommand apduCommand = ApduCommand.createCase3(0x01, 0x02, 0x03, 0x04, data);
+            ApduCommand apduCommand = ApduCommand.createCase3(
+                    0x01, 0x02, 0x03, 0x04,
+                    data, false
+            );
             fail();
         } catch (IllegalArgumentException exception) {
             System.out.println(exception);
@@ -159,7 +190,10 @@ public class ApduCommandTest {
         expected.write(le);
         byte[] expectedByteArray = expected.toByteArray();
 
-        ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0x1);
+        ApduCommand apduCommand = ApduCommand.createCase4(
+                0x01, 0x02, 0x03, 0x04,
+                data, 0x1, false
+        );
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
@@ -188,7 +222,10 @@ public class ApduCommandTest {
         expected.write(le);
         byte[] expectedByteArray = expected.toByteArray();
 
-        ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0x0100);
+        ApduCommand apduCommand = ApduCommand.createCase4(
+                0x01, 0x02, 0x03, 0x04,
+                data, 0x0100, true
+        );
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
@@ -200,7 +237,23 @@ public class ApduCommandTest {
     }
 
     @Test
-    public void createCase4Test3() throws IOException {
+    public void createCase4TestException1() throws IOException {
+        byte[] data = new byte[256];
+        rand.nextBytes(data);
+
+        try {
+            ApduCommand apduCommand = ApduCommand.createCase4(
+                    0x01, 0x02, 0x03, 0x04,
+                    data, 0x0100, false
+            );
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void createCase4Test4() throws IOException {
         byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
         byte[] dataSize = new byte[]{0x00, 0x01, 0x00}; // 256
         byte[] data = new byte[256];
@@ -217,7 +270,10 @@ public class ApduCommandTest {
         expected.write(le);
         byte[] expectedByteArray = expected.toByteArray();
 
-        ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0xFFFF);
+        ApduCommand apduCommand = ApduCommand.createCase4(
+                0x01, 0x02, 0x03, 0x04,
+                data, 0xFFFF, true
+        );
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
@@ -229,11 +285,29 @@ public class ApduCommandTest {
     }
 
     @Test
-    public void createCase4Test4() {
+    public void createCase4TestException2() {
         byte[] data = new byte[256];
 
         try {
-            ApduCommand apduCommand = ApduCommand.createCase4(0x01, 0x02, 0x03, 0x04, data, 0x010000);
+            ApduCommand apduCommand = ApduCommand.createCase4(
+                    0x01, 0x02, 0x03, 0x04,
+                    data, 0x010000, false
+            );
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void createCase4TestException3() {
+        byte[] data = new byte[256];
+
+        try {
+            ApduCommand apduCommand = ApduCommand.createCase4(
+                    0x01, 0x02, 0x03, 0x04,
+                    data, 0x010000, true
+            );
             fail();
         } catch (IllegalArgumentException exception) {
             System.out.println(exception);

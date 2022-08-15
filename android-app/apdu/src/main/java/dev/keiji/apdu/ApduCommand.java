@@ -93,8 +93,10 @@ public class ApduCommand {
      * Conditional body.
      */
     public static class Body {
-        private static final int MAX_LC_LENGTH = 0x0000FFFF;
-        private static final int MAX_LE_LENGTH = 0x0000FFFF;
+        private static final int MAX_LC_LENGTH = 0x000000FF;
+        private static final int MAX_LE_LENGTH = 0x000000FF;
+        private static final int MAX_LC_EXTENDED_LENGTH = 0x0000FFFF;
+        private static final int MAX_LE_EXTENDED_LENGTH = 0x0000FFFF;
 
         /**
          * Number of bytes present in the data field of the command.
@@ -114,10 +116,11 @@ public class ApduCommand {
         /**
          * Constructor.
          *
-         * @param data String of bytes sent in the data field of the command
-         * @param ne   Maximum number of bytes expected in the data field of the response to the command
+         * @param data                String of bytes sent in the data field of the command
+         * @param ne                  Maximum number of bytes expected in the data field of the response to the command
+         * @param enableExtendedField Whether the APDU supports extended length
          */
-        public Body(byte[] data, Integer ne) {
+        public Body(byte[] data, Integer ne, boolean enableExtendedField) {
             if (data == null && ne == null) {
                 throw new IllegalArgumentException("Either `data` or `ne` must not be null.");
             }
@@ -125,8 +128,10 @@ public class ApduCommand {
             if (data == null) {
                 this.data = null;
                 this.lc = null;
-            } else if (data.length > MAX_LC_LENGTH) {
+            } else if (!enableExtendedField && data.length > MAX_LC_LENGTH) {
                 throw new IllegalArgumentException("`data` size must be less or equal than " + MAX_LC_LENGTH + " bytes.");
+            } else if (enableExtendedField && data.length > MAX_LC_EXTENDED_LENGTH) {
+                throw new IllegalArgumentException("`data` size must be less or equal than " + MAX_LC_EXTENDED_LENGTH + " bytes.");
             } else {
                 this.data = data;
                 this.lc = Utils.integerToByteArrayForLcOrLe(data.length);
@@ -134,8 +139,10 @@ public class ApduCommand {
 
             if (ne == null) {
                 this.le = null;
-            } else if (ne > MAX_LE_LENGTH) {
+            } else if (!enableExtendedField && ne > MAX_LE_LENGTH) {
                 throw new IllegalArgumentException("`ne` must be less or equal than " + MAX_LE_LENGTH + " bytes.");
+            } else if (enableExtendedField && ne > MAX_LE_EXTENDED_LENGTH) {
+                throw new IllegalArgumentException("`ne` must be less or equal than " + MAX_LE_EXTENDED_LENGTH + " bytes.");
             } else {
                 this.le = Utils.integerToByteArrayForLcOrLe(ne);
             }
@@ -249,15 +256,22 @@ public class ApduCommand {
      * Command data: No data
      * Expected response data: Data
      *
-     * @param cla Class of instruction
-     * @param ins Instruction code
-     * @param p1  Instruction parameter 1
-     * @param p2  Instruction parameter 2
-     * @param ne  Number of bytes present in the data field of the command
+     * @param cla                 Class of instruction
+     * @param ins                 Instruction code
+     * @param p1                  Instruction parameter 1
+     * @param p2                  Instruction parameter 2
+     * @param ne                  Number of bytes present in the data field of the command
+     * @param enableExtendedField Whether the APDU supports extended length
      * @return ApduCommand object
      */
-    public static ApduCommand createCase2(int cla, int ins, int p1, int p2, int ne) {
-        return new ApduCommand(new Header(cla, ins, p1, p2), new Body(null, ne));
+    public static ApduCommand createCase2(
+            int cla, int ins, int p1, int p2,
+            int ne, boolean enableExtendedField
+    ) {
+        return new ApduCommand(
+                new Header(cla, ins, p1, p2),
+                new Body(null, ne, enableExtendedField)
+        );
     }
 
     /**
@@ -265,15 +279,22 @@ public class ApduCommand {
      * Command data: Data
      * Expected response data: No data
      *
-     * @param cla  Class of instruction
-     * @param ins  Instruction code
-     * @param p1   Instruction parameter 1
-     * @param p2   Instruction parameter 2
-     * @param data String of bytes sent in the data field of the command
+     * @param cla                 Class of instruction
+     * @param ins                 Instruction code
+     * @param p1                  Instruction parameter 1
+     * @param p2                  Instruction parameter 2
+     * @param data                String of bytes sent in the data field of the command
+     * @param enableExtendedField Whether the APDU supports extended length
      * @return ApduCommand object
      */
-    public static ApduCommand createCase3(int cla, int ins, int p1, int p2, byte[] data) {
-        return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, null));
+    public static ApduCommand createCase3(
+            int cla, int ins, int p1, int p2,
+            byte[] data, boolean enableExtendedField
+    ) {
+        return new ApduCommand(
+                new Header(cla, ins, p1, p2),
+                new Body(data, null, enableExtendedField)
+        );
     }
 
     /**
@@ -281,15 +302,22 @@ public class ApduCommand {
      * Command data: Data
      * Expected response data: Data
      *
-     * @param cla  Class of instruction
-     * @param ins  Instruction code
-     * @param p1   Instruction parameter 1
-     * @param p2   Instruction parameter 2
-     * @param data String of bytes sent in the data field of the command.
-     * @param ne   Maximum number of bytes expected in the data field of the response to the command
+     * @param cla                 Class of instruction
+     * @param ins                 Instruction code
+     * @param p1                  Instruction parameter 1
+     * @param p2                  Instruction parameter 2
+     * @param data                String of bytes sent in the data field of the command.'
+     * @param ne                  Maximum number of bytes expected in the data field of the response to the command
+     * @param enableExtendedField Whether the APDU supports extended length
      * @return ApduCommand object
      */
-    public static ApduCommand createCase4(int cla, int ins, int p1, int p2, byte[] data, int ne) {
-        return new ApduCommand(new Header(cla, ins, p1, p2), new Body(data, ne));
+    public static ApduCommand createCase4(
+            int cla, int ins, int p1, int p2,
+            byte[] data, int ne, boolean enableExtendedField
+    ) {
+        return new ApduCommand(
+                new Header(cla, ins, p1, p2),
+                new Body(data, ne, enableExtendedField)
+        );
     }
 }
