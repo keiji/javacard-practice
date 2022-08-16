@@ -163,14 +163,8 @@ class MainActivity : AppCompatActivity() {
                 0x00, 0xA4, 0x04, 0x0C,
                 data, false
             )
-            val bb = ByteBuffer.allocate(apduCommand.size()).also {
-                apduCommand.writeTo(it)
-            }
 
-            val sendData = bb.let {
-                it.rewind()
-                it.array()
-            }
+            val sendData = apduCommand.bytes
 
             Log.d(TAG, "transceive ready ${sendData.toHex(":")}")
 
@@ -179,8 +173,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "transceived ${responseBytes}")
 
             val apduResponse = ApduResponse(responseBytes)
-
-            bb.clear()
 
             card.close()
 

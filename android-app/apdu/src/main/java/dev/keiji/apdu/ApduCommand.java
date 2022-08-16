@@ -16,8 +16,6 @@
 
 package dev.keiji.apdu;
 
-import java.nio.ByteBuffer;
-
 /**
  * Command APDU.
  */
@@ -77,15 +75,21 @@ public class ApduCommand {
         }
 
         /**
-         * Write this object to the given ByteBuffer.
+         * Write the header to the given ByteArray.
          *
-         * @param byteBuffer The ByteBuffer to which this object should output
+         * @param byteArray The ByteArray to which this object should output
+         * @param offset    The offset within the array of the first byte to be read
          */
-        public void writeTo(ByteBuffer byteBuffer) {
-            byteBuffer.put(cla)
-                    .put(ins)
-                    .put(p1)
-                    .put(p2);
+        public void writeTo(byte[] byteArray, int offset) {
+            int expectedLength = offset + size();
+            if (byteArray.length < expectedLength) {
+                throw new IllegalArgumentException("byteArray length must be greater than " + expectedLength);
+            }
+
+            byteArray[offset] = cla;
+            byteArray[offset + 1] = ins;
+            byteArray[offset + 2] = p1;
+            byteArray[offset + 3] = p2;
         }
     }
 
@@ -168,19 +172,29 @@ public class ApduCommand {
         }
 
         /**
-         * Write this object to the given ByteBuffer.
+         * Write the body to the given ByteArray.
          *
-         * @param byteBuffer The ByteBuffer to which this object should output
+         * @param byteArray The ByteArray to which this object should output
+         * @param offset    The offset within the array of the first byte to be read
          */
-        public void writeTo(ByteBuffer byteBuffer) {
+        public void writeTo(byte[] byteArray, int offset) {
+            int expectedLength = offset + size();
+            if (byteArray.length < expectedLength) {
+                throw new IllegalArgumentException("byteArray length must be greater than " + expectedLength);
+            }
+
+            int index = offset;
             if (lc != null) {
-                byteBuffer.put(lc);
+                System.arraycopy(lc, 0, byteArray, index, lc.length);
+                index += lc.length;
             }
             if (data != null) {
-                byteBuffer.put(data);
+                System.arraycopy(data, 0, byteArray, index, data.length);
+                index += data.length;
             }
             if (le != null) {
-                byteBuffer.put(le);
+                System.arraycopy(le, 0, byteArray, index, le.length);
+                index += le.length;
             }
         }
     }
@@ -224,15 +238,43 @@ public class ApduCommand {
     }
 
     /**
-     * Write this object to the given ByteBuffer.
+     * Returns the byte array that this APDU command.
      *
-     * @param byteBuffer The ByteBuffer to which this object should output
+     * @return The result byte array
      */
-    public void writeTo(ByteBuffer byteBuffer) {
-        header.writeTo(byteBuffer);
+    public byte[] getBytes() {
+        byte[] byteArray = new byte[size()];
+        writeTo(byteArray);
+        return byteArray;
+    }
+
+    /**
+     * Write this APDU command to the given ByteArray.
+     *
+     * @param byteArray The ByteArray to which this object should output
+     */
+    public void writeTo(byte[] byteArray) {
+        writeTo(byteArray, 0);
+    }
+
+    /**
+     * Write this APDU command to the given ByteArray.
+     *
+     * @param byteArray The ByteArray to which this object should output
+     * @param offset    The offset within the array of the first byte to be read
+     */
+    public void writeTo(byte[] byteArray, int offset) {
+        int expectedLength = offset + size();
+        if (byteArray.length < expectedLength) {
+            throw new IllegalArgumentException("byteArray length must be greater than " + expectedLength + " bytes.");
+        }
+
+        int index = offset;
+        header.writeTo(byteArray, index);
+        index += header.size();
 
         if (body != null) {
-            body.writeTo(byteBuffer);
+            body.writeTo(byteArray, index);
         }
     }
 

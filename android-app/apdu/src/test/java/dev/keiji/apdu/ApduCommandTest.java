@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Random;
 
 public class ApduCommandTest {
@@ -25,11 +24,25 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, apduCommand.getBytes());
+    }
+
+    @Test
+    public void createCase1TestException0() {
+        ApduCommand apduCommand = ApduCommand.createCase1(0x01, 0x02, 0x03, 0x04);
+
+        byte[] arrayLengthNotEnough = new byte[apduCommand.size() - 1];
+
+        try {
+            apduCommand.writeTo(arrayLengthNotEnough, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
     }
 
     @Test
@@ -45,11 +58,28 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
+        assertArrayEquals(expected, apduCommand.getBytes());
+    }
+
+    @Test
+    public void createCase2TestException0() {
+        ApduCommand apduCommand = ApduCommand.createCase2(
+                0x01, 0x02, 0x03, 0x04,
+                0xFF, false
+        );
+
+        byte[] arrayLengthNotEnough = new byte[apduCommand.size() - 1];
+
+        try {
+            apduCommand.writeTo(arrayLengthNotEnough, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
     }
 
     @Test
@@ -74,11 +104,31 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expectedByteArray, actual);
+        assertArrayEquals(expectedByteArray, apduCommand.getBytes());
+    }
+
+    @Test
+    public void createCase3TestException0() {
+        byte[] data = new byte[255];
+        rand.nextBytes(data);
+
+        ApduCommand apduCommand = ApduCommand.createCase3(
+                0x01, 0x02, 0x03, 0x04,
+                data, false
+        );
+
+        byte[] arrayLengthNotEnough = new byte[apduCommand.size() - 1];
+
+        try {
+            apduCommand.writeTo(arrayLengthNotEnough, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
     }
 
     @Test
@@ -103,11 +153,11 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expectedByteArray, actual);
+        assertArrayEquals(expectedByteArray, apduCommand.getBytes());
     }
 
     @Test
@@ -132,11 +182,11 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expectedByteArray, actual);
+        assertArrayEquals(expectedByteArray, apduCommand.getBytes());
     }
 
     @Test
@@ -171,7 +221,6 @@ public class ApduCommandTest {
         }
     }
 
-
     @Test
     public void createCase4Test1() throws IOException {
         byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
@@ -197,11 +246,31 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expectedByteArray, actual);
+        assertArrayEquals(expectedByteArray, apduCommand.getBytes());
+    }
+
+    @Test
+    public void createCase4TestException0() {
+        byte[] data = new byte[255];
+        rand.nextBytes(data);
+
+        ApduCommand apduCommand = ApduCommand.createCase4(
+                0x01, 0x02, 0x03, 0x04,
+                data, 0x1, false
+        );
+
+        byte[] arrayLengthNotEnough = new byte[apduCommand.size() - 1];
+
+        try {
+            apduCommand.writeTo(arrayLengthNotEnough, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
     }
 
     @Test
@@ -229,11 +298,11 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expectedByteArray, actual);
+        assertArrayEquals(expectedByteArray, apduCommand.getBytes());
     }
 
     @Test
@@ -277,11 +346,11 @@ public class ApduCommandTest {
         int actualSize = apduCommand.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(apduCommand.size());
-        apduCommand.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[apduCommand.size()];
+        apduCommand.writeTo(actual, 0);
 
         assertArrayEquals(expectedByteArray, actual);
+        assertArrayEquals(expectedByteArray, apduCommand.getBytes());
     }
 
     @Test

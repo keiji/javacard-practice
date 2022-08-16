@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Random;
 
 public class ApduBodyTest {
@@ -24,11 +23,25 @@ public class ApduBodyTest {
         int actualSize = body.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(body.size());
-        body.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void createBodyTestException0() {
+
+        ApduCommand.Body body = new ApduCommand.Body(null, 0xFF, false);
+
+        byte[] arrayLengthNotEnough = new byte[body.size() - 1];
+
+        try {
+            body.writeTo(arrayLengthNotEnough, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
     }
 
     @Test
@@ -51,9 +64,8 @@ public class ApduBodyTest {
         int actualSize = body.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(body.size());
-        body.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
     }
@@ -69,9 +81,8 @@ public class ApduBodyTest {
         int actualSize = body.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(body.size());
-        body.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
     }
@@ -87,9 +98,8 @@ public class ApduBodyTest {
         int actualSize = body.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(body.size());
-        body.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
     }
@@ -127,9 +137,8 @@ public class ApduBodyTest {
         int actualSize = body.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(body.size());
-        body.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
 
         assertArrayEquals(expectedByteArray, actual);
     }
@@ -169,9 +178,8 @@ public class ApduBodyTest {
         int actualSize = body.size();
         assertEquals(expectedSize, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(body.size());
-        body.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
     }

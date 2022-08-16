@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
-import java.nio.ByteBuffer;
-
 public class ApduHeaderTest {
 
     @Test
@@ -20,11 +18,27 @@ public class ApduHeaderTest {
         int actualSize = header.size();
         assertEquals(4, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(header.size());
-        header.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[header.size()];
+        header.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void createHeaderTestException0() {
+
+        ApduCommand.Header header = new ApduCommand.Header(
+                0xFF, 0x02, 0x03, 0x04
+        );
+
+        byte[] arrayLengthNotEnough = new byte[header.size() - 1];
+
+        try {
+            header.writeTo(arrayLengthNotEnough, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
     }
 
     @Test
@@ -37,9 +51,8 @@ public class ApduHeaderTest {
         int actualSize = header.size();
         assertEquals(4, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(header.size());
-        header.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[header.size()];
+        header.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
     }
@@ -54,9 +67,8 @@ public class ApduHeaderTest {
         int actualSize = header.size();
         assertEquals(4, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(header.size());
-        header.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[header.size()];
+        header.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
     }
@@ -71,9 +83,8 @@ public class ApduHeaderTest {
         int actualSize = header.size();
         assertEquals(4, actualSize);
 
-        ByteBuffer bb = ByteBuffer.allocate(header.size());
-        header.writeTo(bb);
-        byte[] actual = bb.array();
+        byte[] actual = new byte[header.size()];
+        header.writeTo(actual, 0);
 
         assertArrayEquals(expected, actual);
     }
