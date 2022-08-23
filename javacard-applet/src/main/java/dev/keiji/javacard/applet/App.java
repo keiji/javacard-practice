@@ -1,10 +1,11 @@
 package dev.keiji.javacard.applet;
 
-import javacard.framework.APDU;
-import javacard.framework.Applet;
-import javacard.framework.ISOException;
+import javacard.framework.*;
 
 public class App extends Applet {
+    private static final byte APDU_SELECT_CLA = 0x00;
+    private static final byte APDU_SELECT_INS = (byte) 0xAC;
+
     private App() {
         register();
     }
@@ -18,10 +19,26 @@ public class App extends Applet {
         return true;
     }
 
-    private int a = 0;
-
     @Override
     public void process(APDU apdu) throws ISOException {
-        a++;
+        byte[] buffer = apdu.getBuffer();
+        byte cla = buffer[ISO7816.OFFSET_CLA];
+        byte ins = buffer[ISO7816.OFFSET_INS];
+
+        if (cla == APDU_SELECT_CLA && ins == APDU_SELECT_INS) {
+            return;
+        }
+
+        short bytesRead = apdu.setIncomingAndReceive();
+        short echoOffset = (short) 0;
+
+        while (bytesRead > 0) {
+            Util.arrayCopyNonAtomic(buffer, ISO7816.OFFSET_CDATA, buffer, echoOffset, bytesRead);
+            echoOffset += bytesRead;
+            bytesRead = apdu.receiveBytes(ISO7816.OFFSET_CDATA);
+        }
+
+        apdu.setOutgoing();
+        apdu.sendBytes((short) 0, echoOffset);
     }
 }
