@@ -22,7 +22,6 @@ import dev.keiji.apdu.ApduResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.nio.ByteBuffer
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -134,13 +133,15 @@ class MainActivity : AppCompatActivity() {
                 val apduResponse = select(
                     card,
                     byteArrayOf(
-                        0x01,
-                        0x01,
-                        0x01,
-                        0x01,
-                        0x01,
-                        0x01,
-                        0x01
+                        0x0F,
+                        0x02,
+                        0x03,
+                        0x04,
+                        0x05,
+                        0x06,
+                        0x07,
+                        0x03,
+                        0x02,
                     )
                 )
                 setStatusText("apduResponse: ${apduResponse.statusWord1}, ${apduResponse.statusWord2}")

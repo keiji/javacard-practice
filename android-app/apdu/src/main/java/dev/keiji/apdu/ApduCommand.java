@@ -78,7 +78,7 @@ public class ApduCommand {
          * Write the header to the given ByteArray.
          *
          * @param byteArray The ByteArray to which this object should output
-         * @param offset    The offset within the array of the first byte to be read
+         * @param offset    The offset within the array of the first byte to be write
          */
         public void writeTo(byte[] byteArray, int offset) {
             int expectedLength = offset + size();
@@ -175,7 +175,7 @@ public class ApduCommand {
          * Write the body to the given ByteArray.
          *
          * @param byteArray The ByteArray to which this object should output
-         * @param offset    The offset within the array of the first byte to be read
+         * @param offset    The offset within the array of the first byte to be write
          */
         public void writeTo(byte[] byteArray, int offset) {
             int expectedLength = offset + size();
@@ -261,7 +261,7 @@ public class ApduCommand {
      * Write this APDU command to the given ByteArray.
      *
      * @param byteArray The ByteArray to which this object should output
-     * @param offset    The offset within the array of the first byte to be read
+     * @param offset    The offset within the array of the first byte to be write
      */
     public void writeTo(byte[] byteArray, int offset) {
         int expectedLength = offset + size();
