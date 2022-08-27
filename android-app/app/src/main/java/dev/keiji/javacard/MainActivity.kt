@@ -10,8 +10,6 @@ import android.nfc.NfcManager
 import android.nfc.Tag
 import android.nfc.TagLostException
 import android.nfc.tech.IsoDep
-import android.nfc.tech.NfcA
-import android.nfc.tech.NfcB
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -34,8 +32,8 @@ class MainActivity : AppCompatActivity() {
         private val INTENT_FILTER = IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED)
         private val TECH_LIST_ARRAY =
             arrayOf(
-                arrayOf<String>(NfcA::class.java.name),
-//                arrayOf<String>(NfcB::class.java.name)
+                arrayOf<String>(android.nfc.tech.NfcA::class.java.name),
+//                arrayOf<String>(android.nfc.tech.NfcB::class.java.name)
             )
     }
 
@@ -166,9 +164,14 @@ class MainActivity : AppCompatActivity() {
 
             Log.d(TAG, "connected ${0xAC.toByte()}")
 
-            val selectCommand = SelectFile.create(
-                SelectFile.P1.DIRECT_SELECTION_BY_DF_NAME,
-                SelectFile.P2.FIRST_RECORD or SelectFile.P2.RETURN_FMD_TEMPLATE or SelectFile.P2.RETURN_FCP_TEMPLATE,
+            val selectCommand = SelectFile(
+                0x00,
+                arrayOf(SelectFile.P1.DIRECT_SELECTION_BY_DF_NAME),
+                arrayOf(
+                    SelectFile.P2.FIRST_RECORD,
+                    SelectFile.P2.RETURN_FMD_TEMPLATE,
+                    SelectFile.P2.RETURN_FCP_TEMPLATE
+                ),
                 data, false
             )
 

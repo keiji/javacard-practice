@@ -5,87 +5,104 @@ import dev.keiji.apdu.ApduCommand;
 public class SelectFile implements BaseCommand {
 
     public static class P1 {
+        public final int value;
+
+        public P1(int value) {
+            this.value = value;
+        }
+
         /**
          * Select MF, DF or EF (data field=identifier or empty).
          */
-        public static final int SELECT_MF_DF_EF = 0b000000_00;
+        public static final P1 SELECT_MF_DF_EF = new P1(0b000000_00);
 
         /**
          * Select child DF (data field=DF identifier).
          */
-        public static final int SELECT_CHILD_DF = 0b000000_01;
+        public static final P1 SELECT_CHILD_DF = new P1(0b000000_01);
 
         /**
          * Select EF under current DF (data field=EF identifier).
          */
-        public static final int SELECT_EF_UNDER_CURRENT_DF = 0b000000_10;
+        public static final P1 SELECT_EF_UNDER_CURRENT_DF = new P1(0b000000_10);
 
         /**
          * Select parent DF of the current DF (empty data field).
          */
-        public static final int SELECT_PARENT_DF_OF_CURRENT_DF = 0b000000_11;
+        public static final P1 SELECT_PARENT_DF_OF_CURRENT_DF = new P1(0b000000_11);
 
         /**
          * Direct selection by DF name (data field=DF name).
          */
-        public static final int DIRECT_SELECTION_BY_DF_NAME = 0b000001_00;
+        public static final P1 DIRECT_SELECTION_BY_DF_NAME = new P1(0b000001_00);
 
         /**
          * Select from MF (data field=path without the identifier of the MF).
          */
-        public static final int SELECT_FROM_MF = 0b00001_000;
+        public static final P1 SELECT_FROM_MF = new P1(0b00001_000);
 
         /**
          * Select from current DF (data field=path without the identifier of the current DF).
          */
-        public static final int SELECT_FROM_CURRENT_DF = 0b00001_001;
+        public static final P1 SELECT_FROM_CURRENT_DF = new P1(0b00001_001);
+
     }
 
     public static class P2 {
+        public final int value;
+
+        public P2(int value) {
+            this.value = value;
+        }
+
         /**
          * First record.
          */
-        public static final int FIRST_RECORD = 0b0000_00_00;
+        public static final P2 FIRST_RECORD = new P2(0b0000_00_00);
 
         /**
          * Last record.
          */
-        public static final int LAST_RECORD = 0b0000_00_01;
+        public static final P2 LAST_RECORD = new P2(0b0000_00_01);
 
         /**
          * Next record.
          */
-        public static final int NEXT_RECORD = 0b0000_00_10;
+        public static final P2 NEXT_RECORD = new P2(0b0000_00_10);
 
         /**
          * Previous record.
          */
-        public static final int PREVIOUS_RECORD = 0b0000_00_11;
+        public static final P2 PREVIOUS_RECORD = new P2(0b0000_00_11);
 
         /**
          * Return FCI, optional template.
          */
-        public static final int RETURN_FCI_OPTIONAL_TEMPLATE = 0b000000_00;
+        public static final P2 RETURN_FCI_OPTIONAL_TEMPLATE = new P2(0b000000_00);
 
         /**
          * Return FCP template.
          */
-        public static final int RETURN_FCP_TEMPLATE = 0b000001_00;
+        public static final P2 RETURN_FCP_TEMPLATE = new P2(0b000001_00);
 
         /**
          * Return FMD template.
          */
-        public static final int RETURN_FMD_TEMPLATE = 0b000010_00;
-    }
-
-    public static SelectFile create(int p1, int p2, byte[] data, boolean enableExtendedField) {
-        return new SelectFile(p1, p2, data, enableExtendedField);
+        public static final P2 RETURN_FMD_TEMPLATE = new P2(0b000010_00);
     }
 
     private final ApduCommand apduCommand;
 
-    private SelectFile(int p1, int p2, byte[] data, boolean enableExtendedField) {
-        apduCommand = ApduCommand.createCase3(0x00, 0xA4, p1, p2, data, enableExtendedField);
+    public SelectFile(int cla, P1[] p1Array, P2[] p2Array, byte[] data, boolean enableExtendedField) {
+        int p1 = 0x00;
+        for (P1 p : p1Array) {
+            p1 |= p.value;
+        }
+        int p2 = 0x00;
+        for (P2 p : p2Array) {
+            p2 |= p.value;
+        }
+        apduCommand = ApduCommand.createCase3(cla, 0xA4, p1, p2, data, enableExtendedField);
     }
 
     @Override
