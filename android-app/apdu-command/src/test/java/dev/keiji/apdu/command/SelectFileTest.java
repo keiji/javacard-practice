@@ -71,6 +71,24 @@ public class SelectFileTest {
     }
 
     @Test
+    public void test_exception0() {
+        byte[] data = new byte[1];
+
+        try {
+            SelectFile selectFile = new SelectFile(
+                    0x100,
+                    new SelectFile.P1[]{SelectFile.P1.DIRECT_SELECTION_BY_DF_NAME},
+                    new SelectFile.P2[]{SelectFile.P2.FIRST_RECORD, SelectFile.P2.RETURN_FCP_TEMPLATE},
+                    data,
+                    false
+            );
+            Assertions.fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
     public void test_exception1() {
         byte[] hugeData = new byte[255 + 1];
 
