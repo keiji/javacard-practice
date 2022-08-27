@@ -9,7 +9,9 @@ import android.nfc.NfcAdapter
 import android.nfc.NfcManager
 import android.nfc.Tag
 import android.nfc.TagLostException
+import android.nfc.tech.IsoDep
 import android.nfc.tech.NfcA
+import android.nfc.tech.NfcB
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,8 +19,8 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
-import dev.keiji.apdu.ApduCommand
 import dev.keiji.apdu.ApduResponse
+import dev.keiji.apdu.command.SelectFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -128,10 +130,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.Main) {
             setStatusText("onNewIntent Card detected: ${id.toHex(":")}")
 
-            val card = NfcA.get(tag)
+            val card = IsoDep.get(tag)
             try {
                 val apduResponse = select(
                     card,
+                    // 0F:02:03:04:05:06:07:03:02
                     byteArrayOf(
                         0x0F,
                         0x02,
@@ -144,8 +147,12 @@ class MainActivity : AppCompatActivity() {
                         0x02,
                     )
                 )
-                setStatusText("apduResponse: ${apduResponse.statusWord1}, ${apduResponse.statusWord2}")
+                setStatusText(
+                    "apduResponse: 0x${Integer.toHexString(apduResponse.statusWord1)}, "
+                            + "0x${Integer.toHexString(apduResponse.statusWord2)}"
+                )
             } catch (exception: TagLostException) {
+                Log.e(TAG, "TagLostException", exception)
                 setStatusText("exception: ${exception.message}")
             }
 
@@ -153,25 +160,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun select(card: NfcA, data: ByteArray): ApduResponse =
+    private suspend fun select(card: IsoDep, data: ByteArray): ApduResponse =
         withContext(Dispatchers.IO) {
             card.connect()
 
-            Log.d(TAG, "connected")
+            Log.d(TAG, "connected ${0xAC.toByte()}")
 
-            // Dummy command
-            val apduCommand = ApduCommand.createCase3(
-                0x00, 0xA4, 0x04, 0x0C,
+            val selectCommand = SelectFile.create(
+                SelectFile.P1.DIRECT_SELECTION_BY_DF_NAME,
+                SelectFile.P2.FIRST_RECORD or SelectFile.P2.RETURN_FMD_TEMPLATE or SelectFile.P2.RETURN_FCP_TEMPLATE,
                 data, false
             )
 
-            val sendData = apduCommand.bytes
+            val sendData = selectCommand.bytes
 
             Log.d(TAG, "transceive ready ${sendData.toHex(":")}")
 
             val responseBytes = card.transceive(sendData)
 
-            Log.d(TAG, "transceived ${responseBytes}")
+            Log.d(TAG, "responseBytes ${responseBytes.toHex(":")}")
 
             val apduResponse = ApduResponse(responseBytes)
 
