@@ -18,6 +18,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import dev.keiji.apdu.ApduResponse
+import dev.keiji.apdu.command.ReadBinary
 import dev.keiji.apdu.command.SelectFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,6 +36,19 @@ class MainActivity : AppCompatActivity() {
                 arrayOf<String>(android.nfc.tech.NfcA::class.java.name),
 //                arrayOf<String>(android.nfc.tech.NfcB::class.java.name)
             )
+
+        // 0F:02:03:04:05:06:07:03:02
+        private val AID = byteArrayOf(
+            0x0F,
+            0x02,
+            0x03,
+            0x04,
+            0x05,
+            0x06,
+            0x07,
+            0x03,
+            0x02,
+        )
     }
 
     private lateinit var buttonStartReader: Button
@@ -76,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         lifecycleScope.launch(Dispatchers.Main) {
-            setStatusText("カードをタッチしてください")
+            setStatusText("カードをタッチしてください", clear = true)
         }
     }
 
@@ -113,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         stopForegroundDispatch()
 
         lifecycleScope.launch(Dispatchers.Main) {
-            setStatusText("")
+            setStatusText("", clear = true)
         }
     }
 
@@ -128,43 +142,49 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.Main) {
             setStatusText("onNewIntent Card detected: ${id.toHex(":")}")
 
-            val card = IsoDep.get(tag)
+            val isoDep = IsoDep.get(tag)
+
             try {
-                val apduResponse = select(
-                    card,
-                    // 0F:02:03:04:05:06:07:03:02
-                    byteArrayOf(
-                        0x0F,
-                        0x02,
-                        0x03,
-                        0x04,
-                        0x05,
-                        0x06,
-                        0x07,
-                        0x03,
-                        0x02,
-                    )
+                connect(isoDep)
+                val selectResponse = select(
+                    isoDep,
+                    AID,
                 )
                 setStatusText(
-                    "apduResponse: 0x${Integer.toHexString(apduResponse.statusWord1)}, "
-                            + "0x${Integer.toHexString(apduResponse.statusWord2)}"
+                    "selectResponse: 0x${Integer.toHexString(selectResponse.statusWord1)}, "
+                            + "0x${Integer.toHexString(selectResponse.statusWord2)}"
+                )
+
+                val readBinaryResponse = readBinary(isoDep)
+                setStatusText(
+                    "readBinaryResponse: 0x${Integer.toHexString(readBinaryResponse.statusWord1)}, "
+                            + "0x${Integer.toHexString(readBinaryResponse.statusWord2)}"
                 )
             } catch (exception: TagLostException) {
                 Log.e(TAG, "TagLostException", exception)
                 setStatusText("exception: ${exception.message}")
+            } finally {
+                close(isoDep)
             }
 
         }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun select(card: IsoDep, data: ByteArray): ApduResponse =
+    private suspend fun connect(isoDep: IsoDep) = withContext(Dispatchers.IO) {
+        isoDep.connect()
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun close(isoDep: IsoDep) = withContext(Dispatchers.IO) {
+        isoDep.close()
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun select(isoDep: IsoDep, data: ByteArray): ApduResponse =
         withContext(Dispatchers.IO) {
-            card.connect()
 
-            Log.d(TAG, "connected ${0xAC.toByte()}")
-
-            val selectCommand = SelectFile(
+            val selectFileCommandData = SelectFile(
                 0x00,
                 arrayOf(SelectFile.P1.DIRECT_SELECTION_BY_DF_NAME),
                 arrayOf(
@@ -173,25 +193,49 @@ class MainActivity : AppCompatActivity() {
                     SelectFile.P2.RETURN_FCP_TEMPLATE
                 ),
                 data, false
-            )
+            ).bytes
 
-            val sendData = selectCommand.bytes
+            Log.d(TAG, "transceive:selectFile: ${selectFileCommandData.toHex(":")}")
 
-            Log.d(TAG, "transceive ready ${sendData.toHex(":")}")
+            val responseBytes = isoDep.transceive(selectFileCommandData)
 
-            val responseBytes = card.transceive(sendData)
-
-            Log.d(TAG, "responseBytes ${responseBytes.toHex(":")}")
+            Log.d(TAG, "responseBytes:selectFile: ${responseBytes.toHex(":")}")
 
             val apduResponse = ApduResponse(responseBytes)
-
-            card.close()
 
             return@withContext apduResponse
         }
 
-    private suspend fun setStatusText(text: String) = withContext(Dispatchers.Main) {
-        status.text = text
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun readBinary(isoDep: IsoDep): ApduResponse =
+        withContext(Dispatchers.IO) {
+            val readBinaryCommandData = ReadBinary(
+                0,
+                0,
+                6,
+                false,
+            ).bytes
+
+            Log.d(TAG, "transceive:readBinary: ${readBinaryCommandData.toHex(":")}")
+
+            val responseBytes = isoDep.transceive(readBinaryCommandData)
+
+            Log.d(TAG, "responseBytes:readBinary: ${responseBytes.toHex(":")}")
+
+            val apduResponse = ApduResponse(responseBytes)
+
+            return@withContext apduResponse
+        }
+
+    private suspend fun setStatusText(
+        text: String,
+        clear: Boolean = false
+    ) = withContext(Dispatchers.Main) {
+        if (clear) {
+            status.text = text
+            return@withContext
+        }
+        status.text = "${status.text}\n${text}"
     }
 
     private fun readTag(intent: Intent): Pair<ByteArray?, Tag?> {
