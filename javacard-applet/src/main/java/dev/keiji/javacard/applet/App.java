@@ -15,11 +15,6 @@ public class App extends Applet {
     }
 
     @Override
-    public boolean select() {
-        return true;
-    }
-
-    @Override
     public void process(APDU apdu) throws ISOException {
         byte[] buffer = apdu.getBuffer();
         byte cla = buffer[ISO7816.OFFSET_CLA];
@@ -31,16 +26,17 @@ public class App extends Applet {
             return;
         }
 
-        short bytesRead = apdu.setIncomingAndReceive();
-        short echoOffset = 0;
-
-        while (bytesRead > 0) {
-            Util.arrayCopyNonAtomic(buffer, ISO7816.OFFSET_CDATA, buffer, echoOffset, bytesRead);
-            echoOffset += bytesRead;
-            bytesRead = apdu.receiveBytes(ISO7816.OFFSET_CDATA);
+        short le = apdu.setOutgoing();
+        if (le < 2) {
+            ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
         }
 
-        apdu.setOutgoing();
-        apdu.sendBytes((short) 0, echoOffset);
+        apdu.setOutgoingLength(le);
+
+        for (byte i = 0; i < le; i++) {
+            buffer[i] = (byte) (buffer[i] ^ (byte) 0xFF);
+        }
+
+        apdu.sendBytes((short) 0, le);
     }
 }
