@@ -4,7 +4,7 @@ import javacard.framework.*;
 
 public class App extends Applet {
     private static final byte APDU_SELECT_CLA = 0x00;
-    private static final byte APDU_SELECT_INS = (byte) 0xAC;
+    private static final byte APDU_SELECT_INS = (byte) 0xA4;
 
     private App() {
         register();
@@ -24,13 +24,15 @@ public class App extends Applet {
         byte[] buffer = apdu.getBuffer();
         byte cla = buffer[ISO7816.OFFSET_CLA];
         byte ins = buffer[ISO7816.OFFSET_INS];
+        byte p1 = buffer[ISO7816.OFFSET_P1];
+        byte p2 = buffer[ISO7816.OFFSET_P2];
 
         if (cla == APDU_SELECT_CLA && ins == APDU_SELECT_INS) {
             return;
         }
 
         short bytesRead = apdu.setIncomingAndReceive();
-        short echoOffset = (short) 0;
+        short echoOffset = 0;
 
         while (bytesRead > 0) {
             Util.arrayCopyNonAtomic(buffer, ISO7816.OFFSET_CDATA, buffer, echoOffset, bytesRead);
