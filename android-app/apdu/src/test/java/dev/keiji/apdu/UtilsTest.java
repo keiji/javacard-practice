@@ -81,7 +81,7 @@ public class UtilsTest {
 
     @Test
     public void integerToByteArrayForLcOrLeTest3() {
-        byte[] expected = new byte[]{(byte) 0xFF, (byte) 0x01, (byte) 0x00};
+        byte[] expected = new byte[]{(byte) 0x00, (byte) 0x01, (byte) 0xFF};
         byte[] result = Utils.integerToByteArrayForLcOrLe(0x00_0001FF);
         assertEquals(3, result.length);
         assertArrayEquals(expected, result);
@@ -89,7 +89,7 @@ public class UtilsTest {
 
     @Test
     public void integerToByteArrayForLcOrLeTest4() {
-        byte[] expected = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0x00};
+        byte[] expected = new byte[]{(byte) 0x00, (byte) 0xFF, (byte) 0xFF};
         byte[] result = Utils.integerToByteArrayForLcOrLe(0x00_00FFFF);
         assertEquals(3, result.length);
         assertArrayEquals(expected, result);

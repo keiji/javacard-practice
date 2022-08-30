@@ -56,7 +56,7 @@ public class ApduBodyTest {
 
     @Test
     public void createBodyTest2() {
-        byte[] expected = new byte[]{(byte) 0xFF, 0x01, 0x00};
+        byte[] expected = new byte[]{0x00, 0x01, (byte) 0xFF};
 
         int expectedSize = 3;
 
@@ -169,7 +169,7 @@ public class ApduBodyTest {
 
     @Test
     public void createBodyTest6() {
-        byte[] expected = new byte[]{0x01, 0x77, (byte) 0xFF, 0x01, 0x00};
+        byte[] expected = new byte[]{0x01, 0x77, 0x00, 0x01, (byte) 0xFF};
         byte[] data = new byte[]{0x77};
 
         int expectedSize = 5;

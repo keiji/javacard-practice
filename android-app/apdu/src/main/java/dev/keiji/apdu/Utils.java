@@ -29,9 +29,6 @@ final class Utils {
     }
 
     static int calcByteArraySizeForLcOrLe(int value) {
-        if ((value & MASK_4TH_BYTE) != 0) {
-            throw new IllegalArgumentException("`value` must be less or equals 3 bytes.");
-        }
         if (value > MAX_LC_OR_LE_VALUE) {
             throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
         }
@@ -44,9 +41,6 @@ final class Utils {
     }
 
     static byte[] integerToByteArrayForLcOrLe(int value) {
-        if ((value & MASK_4TH_BYTE) != 0) {
-            throw new IllegalArgumentException("`value` must be less or equals 3 bytes.");
-        }
         if (value > MAX_LC_OR_LE_VALUE) {
             throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
         }
@@ -58,9 +52,9 @@ final class Utils {
             return result;
         } else {
             byte[] result = new byte[3];
-            result[0] = (byte) (value & MASK_1ST_BYTE);
+            // result[0] = 0x0;
             result[1] = (byte) ((value & MASK_2ND_BYTE) >> 8);
-            result[2] = (byte) ((value & MASK_3RD_BYTE) >> 16);
+            result[2] = (byte) (value & MASK_1ST_BYTE);
             return result;
         }
     }

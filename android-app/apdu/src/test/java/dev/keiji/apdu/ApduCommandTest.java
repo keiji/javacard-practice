@@ -163,7 +163,7 @@ public class ApduCommandTest {
     @Test
     public void createCase3Test3() throws IOException {
         byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
-        byte[] dataSize = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0x00}; // 65,535
+        byte[] dataSize = new byte[]{(byte) 0x00, (byte) 0xFF, (byte) 0xFF}; // 65,535
         byte[] data = new byte[0x00_00FFFF];
         rand.nextBytes(data);
 
@@ -328,7 +328,7 @@ public class ApduCommandTest {
         byte[] data = new byte[256];
         rand.nextBytes(data);
 
-        byte[] le = new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0x00}; // 65,535
+        byte[] le = new byte[]{(byte) 0x00, (byte) 0xFF, (byte) 0xFF}; // 65,535
 
         int expectedSize = 4 + 3 + 256 + 3;
 
