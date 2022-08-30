@@ -48,13 +48,13 @@ public class ReadBinary implements BaseCommand {
             throw new IllegalArgumentException("offset must not be minus value.");
         }
         if (offset > MAX_8BITS_OFFSET_VALUE) {
-            throw new IllegalArgumentException("offset must not be bigger than " + MAX_8BITS_OFFSET_VALUE);
+            throw new IllegalArgumentException("offset must not be greater than " + MAX_8BITS_OFFSET_VALUE);
         }
         if (shortEfIdentifier < 0) {
             throw new IllegalArgumentException("shortEfIdentifier must not be minus value.");
         }
         if (shortEfIdentifier > MAX_5BITS_EF_IDENTIFIER_VALUE) {
-            throw new IllegalArgumentException("shortEfIdentifier must not be bigger than " + MAX_5BITS_EF_IDENTIFIER_VALUE);
+            throw new IllegalArgumentException("shortEfIdentifier must not be greater than " + MAX_5BITS_EF_IDENTIFIER_VALUE);
         }
 
         int p1 = SHORT_EF_IDENTIFIER_MARK | shortEfIdentifier;
