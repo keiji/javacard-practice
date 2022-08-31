@@ -18,7 +18,7 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
-public class SelectFile implements BaseCommand {
+public class SelectFile extends BaseCommand {
 
     public static class P1 {
         public final int value;
@@ -110,6 +110,8 @@ public class SelectFile implements BaseCommand {
     private final ApduCommand apduCommand;
 
     public SelectFile(int cla, P1[] p1Array, P2[] p2Array, byte[] data, boolean enableExtendedField) {
+        super(cla);
+
         int p1 = 0x00;
         for (P1 p : p1Array) {
             p1 |= p.value;
@@ -124,5 +126,12 @@ public class SelectFile implements BaseCommand {
     @Override
     public byte[] getBytes() {
         return apduCommand.getBytes();
+    }
+
+    public class Response extends BaseResponse {
+
+        public Response(byte[] rawData) {
+            super(rawData);
+        }
     }
 }

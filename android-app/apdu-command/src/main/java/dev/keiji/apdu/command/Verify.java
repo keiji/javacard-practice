@@ -18,7 +18,7 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
-public class Verify implements BaseCommand {
+public class Verify extends BaseCommand {
 
     public static class P2 {
         public final int value;
@@ -53,6 +53,8 @@ public class Verify implements BaseCommand {
     }
 
     public Verify(int cla, P2 p2, byte[] data, Integer referenceDataNumber) {
+        super(cla);
+
         if (data != null && data.length == 0) {
             throw new IllegalArgumentException("data length must not be 0.");
         }
@@ -88,5 +90,12 @@ public class Verify implements BaseCommand {
     @Override
     public byte[] getBytes() {
         return apduCommand.getBytes();
+    }
+
+    public class Response extends BaseResponse {
+
+        public Response(byte[] rawData) {
+            super(rawData);
+        }
     }
 }

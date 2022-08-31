@@ -19,11 +19,13 @@ package dev.keiji.apdu.command;
 import dev.keiji.apdu.ApduCommand;
 
 // 29p of https://gnupg.org/ftp/specs/OpenPGP-smart-card-application-2.2.pdf
-public class ComputeDigitalSignature implements BaseCommand {
+public class ComputeDigitalSignature extends BaseCommand {
 
     private final ApduCommand apduCommand;
 
     public ComputeDigitalSignature(int cla, byte[] data, boolean enableExtendedField) {
+        super(cla);
+
         if (data == null) {
             throw new IllegalArgumentException("data must not be null.");
         }
@@ -43,5 +45,12 @@ public class ComputeDigitalSignature implements BaseCommand {
     @Override
     public byte[] getBytes() {
         return apduCommand.getBytes();
+    }
+
+    public class Response extends BaseResponse {
+
+        public Response(byte[] rawData) {
+            super(rawData);
+        }
     }
 }

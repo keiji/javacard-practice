@@ -18,11 +18,13 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
-public class GetChallenge implements BaseCommand {
+public class GetChallenge extends BaseCommand {
 
     private final ApduCommand apduCommand;
 
     public GetChallenge(int cla, int requestLength) {
+        super(cla);
+
         if (requestLength <= 0) {
             throw new IllegalArgumentException("requestLength length must be greater than 0.");
         }
@@ -37,5 +39,12 @@ public class GetChallenge implements BaseCommand {
     @Override
     public byte[] getBytes() {
         return apduCommand.getBytes();
+    }
+
+    public class Response extends BaseResponse {
+
+        public Response(byte[] rawData) {
+            super(rawData);
+        }
     }
 }

@@ -18,7 +18,7 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
-public class ReadBinary implements BaseCommand {
+public class ReadBinary extends BaseCommand {
     private static final int MASK_1ST_BYTE = 0x000000FF;
     private static final int MASK_2ND_BYTE = 0x0000FF00;
 
@@ -31,6 +31,8 @@ public class ReadBinary implements BaseCommand {
     private final ApduCommand apduCommand;
 
     public ReadBinary(int cla, int offset, int ne, boolean enableExtendedField) {
+        super(cla);
+
         if (offset < 0) {
             throw new IllegalArgumentException("offset must not be minus value.");
         }
@@ -44,6 +46,8 @@ public class ReadBinary implements BaseCommand {
     }
 
     public ReadBinary(int cla, int shortEfIdentifier, int offset, int ne, boolean enableExtendedField) {
+        super(cla);
+
         if (offset < 0) {
             throw new IllegalArgumentException("offset must not be minus value.");
         }
@@ -65,5 +69,12 @@ public class ReadBinary implements BaseCommand {
     @Override
     public byte[] getBytes() {
         return apduCommand.getBytes();
+    }
+
+    public class Response extends BaseResponse {
+
+        public Response(byte[] rawData) {
+            super(rawData);
+        }
     }
 }
