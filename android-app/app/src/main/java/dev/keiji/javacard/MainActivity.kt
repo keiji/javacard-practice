@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import dev.keiji.apdu.ApduResponse
 import dev.keiji.apdu.command.ReadBinary
 import dev.keiji.apdu.command.SelectFile
+import dev.keiji.apdu.command.Verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,6 +50,22 @@ class MainActivity : AppCompatActivity() {
             0x03,
             0x02,
         )
+
+        private val CORRECT_PIN = byteArrayOf(
+            0x04,
+            0x05,
+            0x06,
+            0x07,
+        )
+
+        private val WRONG_PIN = byteArrayOf(
+            0x04,
+            0x05,
+            0x06,
+            0x00,
+        )
+
+        private val PIN = CORRECT_PIN
     }
 
     private lateinit var buttonStartReader: Button
@@ -155,10 +172,10 @@ class MainActivity : AppCompatActivity() {
                             + "0x${Integer.toHexString(selectResponse.statusWord2)}"
                 )
 
-                val readBinaryResponse = readBinary(isoDep)
+                val verifyResponse = verify(isoDep, PIN)
                 setStatusText(
-                    "readBinaryResponse: 0x${Integer.toHexString(readBinaryResponse.statusWord1)}, "
-                            + "0x${Integer.toHexString(readBinaryResponse.statusWord2)}"
+                    "verifyResponse: 0x${Integer.toHexString(verifyResponse.statusWord1)}, "
+                            + "0x${Integer.toHexString(verifyResponse.statusWord2)}"
                 )
             } catch (exception: TagLostException) {
                 Log.e(TAG, "TagLostException", exception)
@@ -200,6 +217,27 @@ class MainActivity : AppCompatActivity() {
             val responseBytes = isoDep.transceive(selectFileCommandData)
 
             Log.d(TAG, "responseBytes:selectFile: ${responseBytes.toHex(":")}")
+
+            val apduResponse = ApduResponse(responseBytes)
+
+            return@withContext apduResponse
+        }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun verify(isoDep: IsoDep, pin: ByteArray): ApduResponse =
+        withContext(Dispatchers.IO) {
+
+            val selectFileCommandData = Verify(
+                0x00,
+                Verify.P2.GLOBAL,
+                pin
+            ).bytes
+
+            Log.d(TAG, "transceive:verify: ${selectFileCommandData.toHex(":")}")
+
+            val responseBytes = isoDep.transceive(selectFileCommandData)
+
+            Log.d(TAG, "responseBytes:verify: ${responseBytes.toHex(":")}")
 
             val apduResponse = ApduResponse(responseBytes)
 
