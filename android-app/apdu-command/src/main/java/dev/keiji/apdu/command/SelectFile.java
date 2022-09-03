@@ -19,6 +19,7 @@ package dev.keiji.apdu.command;
 import dev.keiji.apdu.ApduCommand;
 
 public class SelectFile extends BaseCommand {
+    private static final int INS = 0xA4;
 
     public static class P1 {
         public final int value;
@@ -120,7 +121,7 @@ public class SelectFile extends BaseCommand {
         for (P2 p : p2Array) {
             p2 |= p.value;
         }
-        apduCommand = ApduCommand.createCase3(cla, 0xA4, p1, p2, data, enableExtendedField);
+        apduCommand = ApduCommand.createCase3(cla, INS, p1, p2, data, enableExtendedField);
     }
 
     @Override

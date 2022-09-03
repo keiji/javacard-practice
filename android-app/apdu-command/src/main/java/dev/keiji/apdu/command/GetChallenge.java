@@ -19,6 +19,9 @@ package dev.keiji.apdu.command;
 import dev.keiji.apdu.ApduCommand;
 
 public class GetChallenge extends BaseCommand {
+    private static final int INS = 0xB4;
+    private static final int P1 = 0x00;
+    private static final int P2 = 0x00;
 
     private final ApduCommand apduCommand;
 
@@ -30,8 +33,8 @@ public class GetChallenge extends BaseCommand {
         }
 
         apduCommand = ApduCommand.createCase2(
-                cla, 0xB4,
-                0x00, 0x00,
+                cla, INS,
+                P1, P2,
                 requestLength, false
         );
     }

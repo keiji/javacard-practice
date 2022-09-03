@@ -19,6 +19,8 @@ package dev.keiji.apdu.command;
 import dev.keiji.apdu.ApduCommand;
 
 public class ReadBinary extends BaseCommand {
+    private static final int INS = 0xB0;
+
     private static final int MASK_1ST_BYTE = 0x000000FF;
     private static final int MASK_2ND_BYTE = 0x0000FF00;
 
@@ -42,7 +44,7 @@ public class ReadBinary extends BaseCommand {
 
         int p1 = (offset & MASK_2ND_BYTE) >>> 8;
         int p2 = (offset & MASK_1ST_BYTE);
-        apduCommand = ApduCommand.createCase2(cla, 0xB0, p1, p2, ne, enableExtendedField);
+        apduCommand = ApduCommand.createCase2(cla, INS, p1, p2, ne, enableExtendedField);
     }
 
     public ReadBinary(int cla, int shortEfIdentifier, int offset, int ne, boolean enableExtendedField) {
@@ -63,7 +65,7 @@ public class ReadBinary extends BaseCommand {
 
         int p1 = SHORT_EF_IDENTIFIER_MARK | shortEfIdentifier;
         int p2 = (offset & MASK_1ST_BYTE);
-        apduCommand = ApduCommand.createCase2(cla, 0xB0, p1, p2, ne, enableExtendedField);
+        apduCommand = ApduCommand.createCase2(cla, INS, p1, p2, ne, enableExtendedField);
     }
 
     @Override

@@ -20,6 +20,9 @@ import dev.keiji.apdu.ApduCommand;
 
 // 29p of https://gnupg.org/ftp/specs/OpenPGP-smart-card-application-2.2.pdf
 public class ComputeDigitalSignature extends BaseCommand {
+    private static final int INS = 0x2A;
+    private static final int P1 = 0x9E;
+    private static final int P2 = 0x9A;
 
     private final ApduCommand apduCommand;
 
@@ -34,8 +37,8 @@ public class ComputeDigitalSignature extends BaseCommand {
         }
 
         apduCommand = ApduCommand.createCase4(
-                cla, 0x2A,
-                0x9E, 0x9A,
+                cla, INS,
+                P1, P2,
                 data,
                 0,
                 enableExtendedField

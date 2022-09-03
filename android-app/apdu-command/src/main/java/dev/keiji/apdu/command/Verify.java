@@ -19,6 +19,8 @@ package dev.keiji.apdu.command;
 import dev.keiji.apdu.ApduCommand;
 
 public class Verify extends BaseCommand {
+    private static final int INS = 0x20;
+    private static final int P1 = 0x00;
 
     public static class P2 {
         public final int value;
@@ -74,13 +76,13 @@ public class Verify extends BaseCommand {
 
         if (data == null) {
             apduCommand = ApduCommand.createCase1(
-                    cla, 0x20,
-                    0x00, p2Value
+                    cla, INS,
+                    P1, p2Value
             );
         } else {
             apduCommand = ApduCommand.createCase3(
-                    cla, 0x20,
-                    0x00, p2Value,
+                    cla, INS,
+                    P1, p2Value,
                     data,
                     false
             );
