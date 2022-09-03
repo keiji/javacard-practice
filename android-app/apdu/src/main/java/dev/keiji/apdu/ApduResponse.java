@@ -30,7 +30,7 @@ public class ApduResponse {
      */
     public byte[] getData() {
         if (rawData.length == 2) {
-            return null;
+            return new byte[0];
         }
 
         byte[] result = new byte[rawData.length - 2];

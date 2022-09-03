@@ -18,12 +18,14 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import dev.keiji.apdu.ApduResponse
+import dev.keiji.apdu.command.ComputeDigitalSignature
 import dev.keiji.apdu.command.ReadBinary
 import dev.keiji.apdu.command.SelectFile
 import dev.keiji.apdu.command.Verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.security.MessageDigest
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -66,6 +68,8 @@ class MainActivity : AppCompatActivity() {
         )
 
         private val PIN = CORRECT_PIN
+
+        private val SAMPLE_DATA = "Hello".encodeToByteArray()
     }
 
     private lateinit var buttonStartReader: Button
@@ -183,6 +187,22 @@ class MainActivity : AppCompatActivity() {
                     "readBinaryResponse: 0x${Integer.toHexString(readBinaryResponse.statusWord1)}, "
                             + "0x${Integer.toHexString(readBinaryResponse.statusWord2)}"
                 )
+
+                val hashData = MessageDigest.getInstance("SHA-256").digest(SAMPLE_DATA)
+                val computeDigitalSignatureResponse = computeDigitalSignature(
+                    isoDep,
+                    hashData
+                )
+                setStatusText(
+                    "computeDigitalSignatureResponse: 0x${
+                        Integer.toHexString(
+                            computeDigitalSignatureResponse.statusWord1
+                        )
+                    }, "
+                            + "0x${Integer.toHexString(computeDigitalSignatureResponse.statusWord2)}"
+                )
+                setStatusText("Signature: ${computeDigitalSignatureResponse.data.toHex(":")}")
+
             } catch (exception: TagLostException) {
                 Log.e(TAG, "TagLostException", exception)
                 setStatusText("exception: ${exception.message}")
@@ -267,6 +287,29 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "responseBytes:readBinary: ${responseBytes.toHex(":")}")
 
             val apduResponse = ReadBinary.Response(responseBytes)
+
+            return@withContext apduResponse
+        }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun computeDigitalSignature(isoDep: IsoDep, data: ByteArray): ApduResponse =
+        withContext(Dispatchers.IO) {
+            val computeDigitalSignatureCommandData = ComputeDigitalSignature(
+                0,
+                data,
+                false,
+            ).bytes
+
+            Log.d(
+                TAG,
+                "transceive:computeDigitalSignature: ${computeDigitalSignatureCommandData.toHex(":")}"
+            )
+
+            val responseBytes = isoDep.transceive(computeDigitalSignatureCommandData)
+
+            Log.d(TAG, "responseBytes:computeDigitalSignature: ${responseBytes.toHex(":")}")
+
+            val apduResponse = ComputeDigitalSignature.Response(responseBytes)
 
             return@withContext apduResponse
         }

@@ -1,6 +1,7 @@
 package dev.keiji.javacard.applet;
 
 import javacard.framework.*;
+import javacard.security.Signature;
 
 public class App extends Applet {
     private static final byte APDU_SELECT_CLA = 0x00;
@@ -8,6 +9,7 @@ public class App extends Applet {
 
     private static final byte APDU_VERIFY_INS = 0x20;
     private static final byte APDU_READ_BINARY_INS = (byte) 0xB0;
+    private static final byte APDU_COMPUTE_DIGITAL_SIGNATURE_INS = (byte) 0x2A;
 
     private static final byte[] DEFAULT_PIN = new byte[]{0x04, 0x05, 0x06, 0x07};
 
@@ -19,6 +21,7 @@ public class App extends Applet {
     private byte counter = 0;
 
     private OwnerPIN ownerPin;
+    private KeyData keyData = null;
 
     private App() {
         initialize();
@@ -29,6 +32,8 @@ public class App extends Applet {
         // Initialize PIN
         ownerPin = new OwnerPIN((byte) 3, (byte) 4);
         ownerPin.update(DEFAULT_PIN, (short) 0, (byte) DEFAULT_PIN.length);
+
+        keyData = new KeyData();
     }
 
     @Override
@@ -45,8 +50,11 @@ public class App extends Applet {
                 processVerify(apdu);
                 break;
             case APDU_READ_BINARY_INS:
-                counter++;
                 processReadBinary(apdu);
+                break;
+            case APDU_COMPUTE_DIGITAL_SIGNATURE_INS:
+                processComputeDigitalSignature(apdu);
+                counter++;
                 break;
             default:
                 ISOException.throwIt(ISO7816.SW_UNKNOWN);
@@ -75,5 +83,25 @@ public class App extends Applet {
         short le = apdu.setOutgoing();
         apdu.setOutgoingLength((short) 2);
         apdu.sendBytesLong(new byte[]{1, counter}, (short) 0, (short) 2);
+    }
+
+    private void processComputeDigitalSignature(APDU apdu) {
+        if (!ownerPin.isValidated()) {
+            ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+        }
+
+        short lc = apdu.setIncomingAndReceive();
+        byte[] targetData = new byte[lc];
+        Util.arrayCopy(apdu.getBuffer(), ISO7816.OFFSET_CDATA, targetData, (short) 0, lc);
+
+        Signature signature = Signature.getInstance(keyData.algorithm, false);
+        signature.init(keyData.keyPair.getPrivate(), Signature.MODE_SIGN);
+
+        byte[] sign = new byte[signature.getLength()];
+        signature.sign(targetData, (short) 0, lc, sign, (short) 0);
+
+        apdu.setOutgoing();
+        apdu.setOutgoingLength((short) sign.length);
+        apdu.sendBytesLong(sign, (short) 0, (short) sign.length);
     }
 }
