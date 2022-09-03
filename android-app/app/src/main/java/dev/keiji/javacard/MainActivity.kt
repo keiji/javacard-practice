@@ -177,6 +177,12 @@ class MainActivity : AppCompatActivity() {
                     "verifyResponse: 0x${Integer.toHexString(verifyResponse.statusWord1)}, "
                             + "0x${Integer.toHexString(verifyResponse.statusWord2)}"
                 )
+
+                val readBinaryResponse = readBinary(isoDep)
+                setStatusText(
+                    "readBinaryResponse: 0x${Integer.toHexString(readBinaryResponse.statusWord1)}, "
+                            + "0x${Integer.toHexString(readBinaryResponse.statusWord2)}"
+                )
             } catch (exception: TagLostException) {
                 Log.e(TAG, "TagLostException", exception)
                 setStatusText("exception: ${exception.message}")
@@ -250,7 +256,7 @@ class MainActivity : AppCompatActivity() {
             val readBinaryCommandData = ReadBinary(
                 0,
                 0,
-                6,
+                1,
                 false,
             ).bytes
 
@@ -260,7 +266,7 @@ class MainActivity : AppCompatActivity() {
 
             Log.d(TAG, "responseBytes:readBinary: ${responseBytes.toHex(":")}")
 
-            val apduResponse = ApduResponse(responseBytes)
+            val apduResponse = ReadBinary.Response(responseBytes)
 
             return@withContext apduResponse
         }

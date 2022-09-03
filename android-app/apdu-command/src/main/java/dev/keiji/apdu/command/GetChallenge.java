@@ -44,7 +44,7 @@ public class GetChallenge extends BaseCommand {
         return apduCommand.getBytes();
     }
 
-    public class Response extends BaseResponse {
+    public static class Response extends BaseResponse {
 
         public Response(byte[] rawData) {
             super(rawData);

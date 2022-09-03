@@ -6,7 +6,8 @@ public class App extends Applet {
     private static final byte APDU_SELECT_CLA = 0x00;
     private static final byte APDU_SELECT_INS = (byte) 0xA4;
 
-    private static final byte INS_VERIFY = 0x20;
+    private static final byte APDU_VERIFY_INS = 0x20;
+    private static final byte APDU_READ_BINARY_INS = (byte) 0xB0;
 
     private static final byte[] DEFAULT_PIN = new byte[]{0x04, 0x05, 0x06, 0x07};
 
@@ -15,8 +16,9 @@ public class App extends Applet {
         theApplet.register();
     }
 
+    private byte counter = 0;
+
     private OwnerPIN ownerPin;
-    private boolean pinLocked = true;
 
     private App() {
         initialize();
@@ -39,8 +41,12 @@ public class App extends Applet {
         }
 
         switch (ins) {
-            case INS_VERIFY:
+            case APDU_VERIFY_INS:
                 processVerify(apdu);
+                break;
+            case APDU_READ_BINARY_INS:
+                counter++;
+                processReadBinary(apdu);
                 break;
             default:
                 ISOException.throwIt(ISO7816.SW_UNKNOWN);
@@ -54,10 +60,20 @@ public class App extends Applet {
         byte[] buffer = apdu.getBuffer();
 
         short lc = apdu.setIncomingAndReceive();
-        pinLocked = !ownerPin.check(buffer, ISO7816.OFFSET_CDATA, (byte) lc);
-        if (pinLocked) {
+        ownerPin.check(buffer, ISO7816.OFFSET_CDATA, (byte) lc);
+        if (!ownerPin.isValidated()) {
             short statusWord = (short) ((SW1_MEMORY_CHANGED << 8) | ownerPin.getTriesRemaining());
             ISOException.throwIt(statusWord);
         }
+    }
+
+    private void processReadBinary(APDU apdu) {
+        if (!ownerPin.isValidated()) {
+            ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+        }
+
+        short le = apdu.setOutgoing();
+        apdu.setOutgoingLength((short) 2);
+        apdu.sendBytesLong(new byte[]{1, counter}, (short) 0, (short) 2);
     }
 }
