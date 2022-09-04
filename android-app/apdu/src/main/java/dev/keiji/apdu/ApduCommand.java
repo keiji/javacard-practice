@@ -121,12 +121,12 @@ public class ApduCommand {
          * Constructor.
          *
          * @param data                String of bytes sent in the data field of the command
-         * @param ne                  Maximum number of bytes expected in the data field of the response to the command
+         * @param le                  Maximum number of bytes expected in the data field of the response to the command
          * @param enableExtendedField Whether the APDU supports extended length
          */
-        public Body(byte[] data, Integer ne, boolean enableExtendedField) {
-            if (data == null && ne == null) {
-                throw new IllegalArgumentException("Either `data` or `ne` must not be null.");
+        public Body(byte[] data, Integer le, boolean enableExtendedField) {
+            if (data == null && le == null) {
+                throw new IllegalArgumentException("Either `data` or `le` must not be null.");
             }
 
             if (data == null) {
@@ -141,14 +141,14 @@ public class ApduCommand {
                 this.lc = Utils.integerToByteArrayForLcOrLe(data.length);
             }
 
-            if (ne == null) {
+            if (le == null) {
                 this.le = null;
-            } else if (!enableExtendedField && ne > MAX_LE_LENGTH) {
-                throw new IllegalArgumentException("`ne` must be less or equal than " + MAX_LE_LENGTH + " bytes.");
-            } else if (enableExtendedField && ne > MAX_LE_EXTENDED_LENGTH) {
-                throw new IllegalArgumentException("`ne` must be less or equal than " + MAX_LE_EXTENDED_LENGTH + " bytes.");
+            } else if (!enableExtendedField && le > MAX_LE_LENGTH) {
+                throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_LENGTH + " bytes.");
+            } else if (enableExtendedField && le > MAX_LE_EXTENDED_LENGTH) {
+                throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_EXTENDED_LENGTH + " bytes.");
             } else {
-                this.le = Utils.integerToByteArrayForLcOrLe(ne);
+                this.le = Utils.integerToByteArrayForLcOrLe(le);
             }
         }
 
@@ -302,17 +302,17 @@ public class ApduCommand {
      * @param ins                 Instruction code
      * @param p1                  Instruction parameter 1
      * @param p2                  Instruction parameter 2
-     * @param ne                  Number of bytes present in the data field of the command
+     * @param le                  Number of bytes present in the data field of the command
      * @param enableExtendedField Whether the APDU supports extended length
      * @return ApduCommand object
      */
     public static ApduCommand createCase2(
             int cla, int ins, int p1, int p2,
-            int ne, boolean enableExtendedField
+            int le, boolean enableExtendedField
     ) {
         return new ApduCommand(
                 new Header(cla, ins, p1, p2),
-                new Body(null, ne, enableExtendedField)
+                new Body(null, le, enableExtendedField)
         );
     }
 
@@ -349,17 +349,17 @@ public class ApduCommand {
      * @param p1                  Instruction parameter 1
      * @param p2                  Instruction parameter 2
      * @param data                String of bytes sent in the data field of the command.'
-     * @param ne                  Maximum number of bytes expected in the data field of the response to the command
+     * @param le                  Maximum number of bytes expected in the data field of the response to the command
      * @param enableExtendedField Whether the APDU supports extended length
      * @return ApduCommand object
      */
     public static ApduCommand createCase4(
             int cla, int ins, int p1, int p2,
-            byte[] data, int ne, boolean enableExtendedField
+            byte[] data, int le, boolean enableExtendedField
     ) {
         return new ApduCommand(
                 new Header(cla, ins, p1, p2),
-                new Body(data, ne, enableExtendedField)
+                new Body(data, le, enableExtendedField)
         );
     }
 }
