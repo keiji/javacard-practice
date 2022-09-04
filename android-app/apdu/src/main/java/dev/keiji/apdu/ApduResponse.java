@@ -21,7 +21,7 @@ package dev.keiji.apdu;
  */
 public class ApduResponse {
 
-    public final byte[] rawData;
+    private final byte[] rawData;
 
     /**
      * Get data.

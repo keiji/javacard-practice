@@ -348,7 +348,7 @@ public class ApduCommand {
      * @param ins                 Instruction code
      * @param p1                  Instruction parameter 1
      * @param p2                  Instruction parameter 2
-     * @param data                String of bytes sent in the data field of the command.'
+     * @param data                String of bytes sent in the data field of the command
      * @param le                  Maximum number of bytes expected in the data field of the response to the command
      * @param enableExtendedField Whether the APDU supports extended length
      * @return ApduCommand object
