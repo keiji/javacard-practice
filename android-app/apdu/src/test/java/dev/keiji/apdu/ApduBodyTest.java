@@ -46,6 +46,21 @@ public class ApduBodyTest {
 
     @Test
     public void createBodyTestException1() {
+
+        ApduCommand.Body body = new ApduCommand.Body(null, 0xFF, false);
+
+        byte[] arrayLengthNotEnough = new byte[body.size()];
+
+        try {
+            body.writeTo(arrayLengthNotEnough, -1);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void createBodyTestException2() {
         try {
             ApduCommand.Body body = new ApduCommand.Body(null, 0x1FF, false);
             fail();
@@ -105,7 +120,7 @@ public class ApduBodyTest {
     }
 
     @Test
-    public void createBodyTestException2() {
+    public void createBodyTestException3() {
         byte[] data = new byte[256];
 
         try {
@@ -144,7 +159,7 @@ public class ApduBodyTest {
     }
 
     @Test
-    public void createBodyTestException3() {
+    public void createBodyTestException4() {
         byte[] data = new byte[0xFFFF + 1];
 
         try {
@@ -156,7 +171,7 @@ public class ApduBodyTest {
     }
 
     @Test
-    public void createBodyTestException4() {
+    public void createBodyTestException5() {
         byte[] data = new byte[1];
 
         try {
@@ -185,7 +200,7 @@ public class ApduBodyTest {
     }
 
     @Test
-    public void createBodyTestException5() {
+    public void createBodyTestException6() {
         byte[] data = new byte[1];
         int ne = 0xFFFF + 1;
 

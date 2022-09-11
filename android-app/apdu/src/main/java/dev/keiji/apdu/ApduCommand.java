@@ -84,6 +84,10 @@ public class ApduCommand {
          * @param offset    The offset within the array of the first byte to be write
          */
         public void writeTo(byte[] byteArray, int offset) {
+            if (offset < 0) {
+                throw new IllegalArgumentException("`offset` value must be greater or equal 0.");
+            }
+
             int expectedLength = offset + size();
             if (byteArray.length < expectedLength) {
                 throw new IllegalArgumentException("byteArray length must be greater than " + expectedLength);
@@ -209,6 +213,10 @@ public class ApduCommand {
          * @param offset    The offset within the array of the first byte to be write
          */
         public void writeTo(byte[] byteArray, int offset) {
+            if (offset < 0) {
+                throw new IllegalArgumentException("`offset` value must be greater or equal 0.");
+            }
+
             int expectedLength = offset + size();
             if (byteArray.length < expectedLength) {
                 throw new IllegalArgumentException("byteArray length must be greater than " + expectedLength);
@@ -366,6 +374,10 @@ public class ApduCommand {
      * @param offset    The offset within the array of the first byte to be write
      */
     public void writeTo(byte[] byteArray, int offset) {
+        if (offset < 0) {
+            throw new IllegalArgumentException("`offset` value must be greater or equal 0.");
+        }
+
         int expectedLength = offset + size();
         if (byteArray.length < expectedLength) {
             throw new IllegalArgumentException("byteArray length must be greater than " + expectedLength + " bytes.");

@@ -42,6 +42,23 @@ public class ApduHeaderTest {
     }
 
     @Test
+    public void createHeaderTestException1() {
+
+        ApduCommand.Header header = new ApduCommand.Header(
+                0xFF, 0x02, 0x03, 0x04
+        );
+
+        byte[] arrayLengthNotEnough = new byte[header.size()];
+
+        try {
+            header.writeTo(arrayLengthNotEnough, -1);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
     public void createHeaderTest2() {
         byte[] expected = new byte[]{0x01, (byte) 0xFF, 0x03, 0x04};
 
@@ -90,7 +107,7 @@ public class ApduHeaderTest {
     }
 
     @Test
-    public void createHeaderTestException1() {
+    public void createHeaderTestException2() {
         try {
             ApduCommand.Header header = new ApduCommand.Header(
                     0x1FF, 0x02, 0x03, 0x04
@@ -102,7 +119,7 @@ public class ApduHeaderTest {
     }
 
     @Test
-    public void createHeaderTestException2() {
+    public void createHeaderTestException3() {
         try {
             ApduCommand.Header header = new ApduCommand.Header(
                     0x01, 0x1FF, 0x03, 0x04
@@ -114,7 +131,7 @@ public class ApduHeaderTest {
     }
 
     @Test
-    public void createHeaderTestException3() {
+    public void createHeaderTestException4() {
         try {
             ApduCommand.Header header = new ApduCommand.Header(
                     0x01, 0x02, 0x1FF, 0x04
@@ -126,7 +143,7 @@ public class ApduHeaderTest {
     }
 
     @Test
-    public void createHeaderTestException4() {
+    public void createHeaderTestException5() {
         try {
             ApduCommand.Header header = new ApduCommand.Header(
                     0x01, 0x02, 0x03, 0x1FF

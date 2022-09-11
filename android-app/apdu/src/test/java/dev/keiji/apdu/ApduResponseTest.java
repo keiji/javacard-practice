@@ -2,6 +2,7 @@ package dev.keiji.apdu;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +20,11 @@ public class ApduResponseTest {
 
         assertEquals(0x01, apduResponse.getStatusWord1());
         assertEquals(0xFF, apduResponse.getStatusWord2());
+
+        byte[] bytes = new byte[apduResponse.size()];
+        apduResponse.writeTo(bytes, 0);
+
+        assertArrayEquals(rawData, bytes);
     }
 
     @Test
@@ -38,6 +44,42 @@ public class ApduResponseTest {
         assertEquals(0x01, apduResponse.getStatusWord1());
         assertEquals(0xFF, apduResponse.getStatusWord2());
         assertArrayEquals(data, apduResponse.getData());
+
+        byte[] bytes = new byte[apduResponse.size()];
+        apduResponse.writeTo(bytes, 0);
+
+        assertArrayEquals(rawData, bytes);
     }
 
+    @Test
+    public void test1_exception1() {
+        byte[] rawData = new byte[]{0x01, (byte) 0xFF};
+
+        ApduResponse apduResponse = new ApduResponse(rawData);
+
+        byte[] bytes = new byte[apduResponse.size()];
+
+        try {
+            apduResponse.writeTo(bytes, -1);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void test1_exception2() {
+        byte[] rawData = new byte[]{0x01, (byte) 0xFF};
+
+        ApduResponse apduResponse = new ApduResponse(rawData);
+
+        byte[] bytes = new byte[apduResponse.size() - 1];
+
+        try {
+            apduResponse.writeTo(bytes, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
 }
