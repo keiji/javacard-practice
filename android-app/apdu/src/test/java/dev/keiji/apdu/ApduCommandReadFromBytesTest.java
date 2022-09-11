@@ -77,6 +77,18 @@ public class ApduCommandReadFromBytesTest {
     }
 
     @Test
+    public void readFromBytesCase2NotExtendedTest2() {
+        ApduCommand expected = ApduCommand.createCase2(0x00, 0xA4, 0x04, 0x00, 0x00, false);
+
+        byte[] apduData = expected.getBytes();
+
+        ApduCommand actual = ApduCommand.readFrom(apduData, 0);
+        assertNotNull(actual);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void readFromBytesCase2ExtendedTest1() {
         ApduCommand expected = ApduCommand.createCase2(0x00, 0xA4, 0x04, 0x00, 0x0100, true);
 

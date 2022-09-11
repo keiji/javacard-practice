@@ -85,7 +85,8 @@ final class Utils {
         }
 
         byte byte1st = byteArray[offset];
-        if (byte1st == 0x00) {
+        boolean hasMoreByte = byteArray.length > (offset + 1);
+        if (byte1st == 0x00 && hasMoreByte) {
             byte[] bytes = new byte[3];
             bytes[1] = byteArray[offset + 1];
             bytes[2] = byteArray[offset + 2];
