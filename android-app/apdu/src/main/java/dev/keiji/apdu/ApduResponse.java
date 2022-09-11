@@ -96,6 +96,16 @@ public class ApduResponse {
      *
      * @param statusWord1 Command processing status
      * @param statusWord2 Command processing qualifier
+     */
+    public ApduResponse(int statusWord1, int statusWord2) {
+        this(statusWord1, statusWord2, new byte[0]);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param statusWord1 Command processing status
+     * @param statusWord2 Command processing qualifier
      * @param data        String of bytes received in the data field of the response
      */
     public ApduResponse(int statusWord1, int statusWord2, byte[] data) {
