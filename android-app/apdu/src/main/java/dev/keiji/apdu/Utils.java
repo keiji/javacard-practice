@@ -24,12 +24,13 @@ final class Utils {
     private static final int MASK_4TH_BYTE = 0xFF000000;
 
     private static final int MAX_LC_OR_LE_VALUE = 0x0000FFFF; // 65535
+    private static final int MASK_INVALID_BYTES = MASK_3RD_BYTE | MASK_4TH_BYTE;
 
     private Utils() {
     }
 
     static int calcByteArraySizeForLcOrLe(int value) {
-        if (value > MAX_LC_OR_LE_VALUE) {
+        if ((value & MASK_INVALID_BYTES) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
         }
 
@@ -41,7 +42,7 @@ final class Utils {
     }
 
     static byte[] integerToByteArrayForLcOrLe(int value) {
-        if (value > MAX_LC_OR_LE_VALUE) {
+        if ((value & MASK_INVALID_BYTES) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
         }
 
@@ -70,5 +71,44 @@ final class Utils {
 
         return (byte) (value & MASK_1ST_BYTE);
 
+    }
+
+    public static byte[] readByteArrayForLcOrLe(byte[] byteArray, int offset) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("`byteArray` must not be null.");
+        }
+        if (offset < 0) {
+            throw new IllegalArgumentException("`offset` value must be greater or equal 0.");
+        }
+        if (byteArray.length <= offset) {
+            throw new IllegalArgumentException("`byteArray` must be greater or equal " + (byteArray.length + offset));
+        }
+
+        byte byte1st = byteArray[offset];
+        if (byte1st == 0x00) {
+            byte[] bytes = new byte[3];
+            bytes[1] = byteArray[offset + 1];
+            bytes[2] = byteArray[offset + 2];
+            return bytes;
+        } else {
+            return new byte[]{byte1st};
+        }
+    }
+
+    public static int convertLcOrLeBytesToInt(byte[] byteArray) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("`byteArray` must not be null.");
+        }
+        if (byteArray.length == 0) {
+            throw new IllegalArgumentException("`byteArray` must not be empty.");
+        }
+
+        if (byteArray.length == 1) {
+            return ((int) byteArray[0] & MASK_1ST_BYTE);
+        } else if (byteArray.length == 3) {
+            return ((int) byteArray[1] & MASK_1ST_BYTE) << 8 | ((int) byteArray[2] & MASK_1ST_BYTE);
+        } else {
+            throw new IllegalArgumentException("`byteArray` length must be 1 or 3.");
+        }
     }
 }

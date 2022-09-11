@@ -152,4 +152,116 @@ public class UtilsTest {
         int actual2 = Utils.convertByteToInt(value);
         assertEquals(expected, actual2);
     }
+
+    @Test
+    public void readByteArrayForLcOrLeTest1() {
+        byte[] byteArray = new byte[] {(byte) 0xFF};
+        int offset = 0;
+
+        byte[] expected = new byte[] {(byte) 0xFF};
+
+        byte[] actual = Utils.readByteArrayForLcOrLe(byteArray, offset);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void readByteArrayForLcOrLeTest1_Exception1() {
+        try {
+            byte[] actual = Utils.readByteArrayForLcOrLe(null, 0);
+            fail();
+        } catch(IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void readByteArrayForLcOrLeTest1_Exception2() {
+        byte[] emptyData = new byte[0];
+        try {
+            byte[] actual = Utils.readByteArrayForLcOrLe(emptyData, 0);
+            fail();
+        } catch(IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void readByteArrayForLcOrLeTest1_Exception3() {
+        try {
+            byte[] actual = Utils.readByteArrayForLcOrLe(new byte[1], -1);
+            fail();
+        } catch(IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void readByteArrayForLcOrLeTest1_Exception4() {
+        try {
+            byte[] actual = Utils.readByteArrayForLcOrLe(new byte[1], 1);
+            fail();
+        } catch(IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void readByteArrayForLcOrLeTest2() {
+        byte[] byteArray = new byte[] {0x00, 0x01, (byte) 0xFF};
+        int offset = 0;
+
+        byte[] expected = new byte[] {0x00, 0x01, (byte) 0xFF};
+
+        byte[] actual = Utils.readByteArrayForLcOrLe(byteArray, offset);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void convertLcOrLeBytesToIntTest1() {
+        int expected = 0xFF;
+        byte[] byteArray = new byte[]{(byte) 0xFF};
+
+        int actual = Utils.convertLcOrLeBytesToInt(byteArray);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void convertLcOrLeBytesToIntTest2() {
+        int expected = 0xFFFF;
+        byte[] byteArray = new byte[]{0x00, (byte) 0xFF, (byte) 0xFF};
+
+        int actual = Utils.convertLcOrLeBytesToInt(byteArray);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void convertLcOrLeBytesToIntTest3() {
+        int expected = 0x1234;
+        byte[] byteArray = new byte[]{0x00, (byte) 0x12, (byte) 0x34};
+
+        int actual = Utils.convertLcOrLeBytesToInt(byteArray);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void convertLcOrLeBytesToIntTest_Exception1() {
+        byte[] byteArray = new byte[]{(byte) 0xFF, (byte) 0xFF};
+
+        try {
+            int actual = Utils.convertLcOrLeBytesToInt(byteArray);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
+
+    @Test
+    public void convertLcOrLeBytesToIntTest_Exception2() {
+        try {
+            int actual = Utils.convertLcOrLeBytesToInt(null);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+        }
+    }
 }

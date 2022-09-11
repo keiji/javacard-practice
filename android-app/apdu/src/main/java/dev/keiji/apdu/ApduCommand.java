@@ -16,6 +16,9 @@
 
 package dev.keiji.apdu;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Command APDU.
  */
@@ -91,6 +94,28 @@ public class ApduCommand {
             byteArray[offset + 2] = p1;
             byteArray[offset + 3] = p2;
         }
+
+        public static Header readFrom(byte[] byteArray, int offset) {
+            return new Header(
+                    byteArray[offset] & 0xFF,
+                    byteArray[offset + 1] & 0xFF,
+                    byteArray[offset + 2] & 0xFF,
+                    byteArray[offset + 3] & 0xFF
+            );
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Header header = (Header) o;
+            return cla == header.cla && ins == header.ins && p1 == header.p1 && p2 == header.p2;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(cla, ins, p1, p2);
+        }
     }
 
     /**
@@ -116,6 +141,12 @@ public class ApduCommand {
          * Maximum number of bytes expected in the data field of the response to the command.
          */
         public final byte[] le;
+
+        private Body(byte[] lc, byte[] data, byte[] le) {
+            this.lc = lc;
+            this.data = data;
+            this.le = le;
+        }
 
         /**
          * Constructor.
@@ -197,6 +228,55 @@ public class ApduCommand {
                 index += le.length;
             }
         }
+
+        public static Body readFrom(byte[] byteArray, int offset) {
+            byte[] lcOrLeBytes = Utils.readByteArrayForLcOrLe(byteArray, offset);
+            int lcOrLeValue = Utils.convertLcOrLeBytesToInt(lcOrLeBytes);
+
+            offset += lcOrLeBytes.length;
+
+            boolean hasData = offset < byteArray.length;
+
+            if (!hasData) {
+                return new Body(
+                        null,
+                        null,
+                        lcOrLeBytes
+                );
+            }
+
+            byte[] data = new byte[lcOrLeValue];
+            System.arraycopy(byteArray, offset, data, 0, lcOrLeValue);
+
+            offset += data.length;
+
+            byte[] leBytes = null;
+            if (offset < byteArray.length) {
+                leBytes = Utils.readByteArrayForLcOrLe(byteArray, offset);
+            }
+
+            return new Body(
+                    lcOrLeBytes,
+                    data,
+                    leBytes
+            );
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Body body = (Body) o;
+            return Arrays.equals(lc, body.lc) && Arrays.equals(data, body.data) && Arrays.equals(le, body.le);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Arrays.hashCode(lc);
+            result = 31 * result + Arrays.hashCode(data);
+            result = 31 * result + Arrays.hashCode(le);
+            return result;
+        }
     }
 
     /**
@@ -248,6 +328,28 @@ public class ApduCommand {
         return byteArray;
     }
 
+    public static ApduCommand readFrom(byte[] byteArray, int offset) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("`byteArray` must not be null.");
+        }
+        if (offset < 0) {
+            throw new IllegalArgumentException("`offset` value must be greater or equal 0.");
+        }
+        if (byteArray.length < offset + 4 /* Header length */) {
+            throw new IllegalArgumentException("`byteArray` length must be greater or equal " + (offset + 4));
+        }
+
+        Header header = Header.readFrom(byteArray, offset);
+        offset += 4;
+
+        Body body = null;
+        if (byteArray.length > offset) {
+            body = Body.readFrom(byteArray, offset);
+        }
+
+        return new ApduCommand(header, body);
+    }
+
     /**
      * Write this APDU command to the given ByteArray.
      *
@@ -276,6 +378,19 @@ public class ApduCommand {
         if (body != null) {
             body.writeTo(byteArray, index);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ApduCommand that = (ApduCommand) o;
+        return header.equals(that.header) && Objects.equals(body, that.body);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(header, body);
     }
 
     /**
