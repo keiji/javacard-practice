@@ -67,6 +67,26 @@ public class ApduResponse {
     }
 
     /**
+     * Returns the byte array that this APDU response.
+     *
+     * @return The result byte array
+     */
+    public byte[] getBytes() {
+        byte[] byteArray = new byte[size()];
+        writeTo(byteArray);
+        return byteArray;
+    }
+
+    /**
+     * Returns the byte array that this APDU response.
+     *
+     * @param byteArray The ByteArray to which this object should output
+     */
+    public void writeTo(byte[] byteArray) {
+        writeTo(byteArray, 0);
+    }
+
+    /**
      * Write the response to the given ByteArray.
      *
      * @param byteArray The ByteArray to which this object should output
