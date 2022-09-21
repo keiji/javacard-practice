@@ -4,17 +4,7 @@ plugins {
     id 'signing'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-group 'dev.keiji.apdu'
-//version '0.9.0'
-version '0.9.0-SNAPSHOT'
-
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-
     withJavadocJar()
     withSourcesJar()
 }
@@ -28,8 +18,8 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 }
 
-Properties sonaTypeProps = new Properties()
-sonaTypeProps.load(project.rootProject.file("sonatype.properties").newDataInputStream())
+group = rootProject.ext.groupId
+version = rootProject.ext.versionCode
 
 publishing {
     publications {
@@ -68,15 +58,10 @@ publishing {
 
     repositories {
         maven {
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('-SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-            def sonatypeUsername = sonaTypeProps.get('sonatypeUsername') ?: ""
-            def sonatypePassword = sonaTypeProps.get('sonatypePassword') ?: ""
+            url = rootProject.ext.repoUrl
             credentials {
-                username = sonatypeUsername
-                password = sonatypePassword
+                username = rootProject.ext.sonatypeUsername
+                password = rootProject.ext.sonatypePassword
             }
         }
     }

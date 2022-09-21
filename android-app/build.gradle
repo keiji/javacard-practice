@@ -5,6 +5,25 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
 }
 
+Properties sonaTypeProps = new Properties()
+File sonatypePropertiesFile = project.rootProject.file("sonatype.properties")
+if (sonatypePropertiesFile.exists()) {
+    sonaTypeProps.load(sonatypePropertiesFile.newDataInputStream())
+}
+
+ext {
+    groupId 'dev.keiji.apdu'
+//    versionCode '0.9.0'
+    versionCode '0.9.0-SNAPSHOT'
+
+    sonatypeUsername = sonaTypeProps.get('sonatypeUsername') ?: ""
+    sonatypePassword = sonaTypeProps.get('sonatypePassword') ?: ""
+
+    def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+    def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+    repoUrl = versionCode.endsWith('-SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
