@@ -6,8 +6,12 @@ Download
 --------
 
 ```groovy
+repositories {
+    maven { url "https://s01.oss.sonatype.org/content/repositories/devkeijiapdu-1010" }
+}
+
 dependencies {
-    implementation 'dev.keiji.apdu:apdu-command:0.9.0'
+    implementation('dev.keiji.apdu:apdu-command:0.9.0')
 }
 ```
 
