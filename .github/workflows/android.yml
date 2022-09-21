@@ -28,9 +28,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       working-directory: ./android-app
-    - name: Build with Gradle
-      run: ./gradlew assemble
-      working-directory: ./android-app
     - name: Execute unit-test
-      run: ./gradlew test
+      run: ./gradlew assemble test
       working-directory: ./android-app
