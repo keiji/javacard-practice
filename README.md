@@ -1,6 +1,11 @@
 JavaCard Practice
 ========
 
+ * APDU for Java
+     * https://github.com/keiji/javacard-practice/tree/main/android-app/apdu
+ * APDU Command helper for Java
+     * https://github.com/keiji/javacard-practice/tree/main/android-app/apdu-command
+
 License
 ========
 
