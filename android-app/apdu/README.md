@@ -1,4 +1,4 @@
-apdu-java
+APDU for Java
 ========
 Utilities for encoding the command of APDU and decoding the response representation of binary data.
 
@@ -12,11 +12,7 @@ Download
 --------
 
 ```groovy
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation 'dev.keiji.apdu:apdu:0.8.9'
+    implementation 'dev.keiji.apdu:apdu:0.9.0'
 }
 ```

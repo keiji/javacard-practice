@@ -1,10 +1,15 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+    id 'signing'
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+
+    withJavadocJar()
+    withSourcesJar()
 }
 
 test {
@@ -12,9 +17,62 @@ test {
 }
 
 dependencies {
-    api project(path: ':apdu')
-//    api 'dev.keiji.apdu:apdu:0.8.9'
+    implementation('dev.keiji.apdu:apdu:0.9.0')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+}
+
+group = rootProject.ext.groupId
+version = rootProject.ext.versionCode
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = "${group}"
+            artifactId = 'apdu-command'
+            version = "${version}"
+
+            from components.java
+
+            pom {
+                name = 'APDU Command helper for Java'
+                description = 'Helper classes for building APDU command.'
+                url = 'https://github.com/keiji/javacard-practice/tree/main/android-app/apdu-command'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'keiji'
+                        name = 'ARIYAMA Keiji'
+                        email = 'keiji.ariyama@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/keiji/javacard-practice.git'
+                    developerConnection = 'https://github.com/keiji/javacard-practice.git'
+                    url = 'https://github.com/keiji/javacard-practice/tree/main/android-app/apdu-command'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = rootProject.ext.repoUrl
+            credentials {
+                username = rootProject.ext.sonatypeUsername
+                password = rootProject.ext.sonatypePassword
+            }
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
 }
