@@ -11,7 +11,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
 //        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://s01.oss.sonatype.org/content/repositories/devkeijiapdu-1010" }
+        maven { url "https://s01.oss.sonatype.org/content/repositories/devkeijiapdu-1011" }
     }
 }
 rootProject.name = "JavaCardPractice"

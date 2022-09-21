@@ -7,7 +7,7 @@ Download
 
 ```groovy
 repositories {
-    maven { url "https://s01.oss.sonatype.org/content/repositories/devkeijiapdu-1010" }
+    maven { url "https://s01.oss.sonatype.org/content/repositories/devkeijiapdu-1011" }
 }
 
 dependencies {
