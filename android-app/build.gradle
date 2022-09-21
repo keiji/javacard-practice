@@ -12,9 +12,9 @@ if (sonatypePropertiesFile.exists()) {
 }
 
 ext {
-    groupId 'dev.keiji.apdu'
-//    versionCode '0.9.0'
-    versionCode '0.9.0-SNAPSHOT'
+    groupId = 'dev.keiji.apdu'
+//    versionCode = '0.9.0'
+    versionCode = '0.9.0-SNAPSHOT'
 
     sonatypeUsername = sonaTypeProps.get('sonatypeUsername') ?: ""
     sonatypePassword = sonaTypeProps.get('sonatypePassword') ?: ""
