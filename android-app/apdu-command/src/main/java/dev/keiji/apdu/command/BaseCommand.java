@@ -26,7 +26,7 @@ public abstract class BaseCommand {
         this.cla = cla;
     }
 
-    abstract byte[] getBytes();
+    public abstract byte[] getBytes();
 
     public static abstract class BaseResponse extends ApduResponse {
         private static final int MASK_1ST_BYTE = 0xFF;
