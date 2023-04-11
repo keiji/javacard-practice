@@ -34,10 +34,7 @@ android {
 }
 
 dependencies {
-//    implementation project(path: ':apdu')
-//    implementation project(path: ':apdu-command')
-
-    implementation("dev.keiji.apdu:apdu-command:${rootProject.ext.versionCode}")
+    implementation project(":apdu-command")
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
