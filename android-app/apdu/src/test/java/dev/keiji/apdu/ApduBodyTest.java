@@ -92,7 +92,7 @@ public class ApduBodyTest {
 
         int expectedSize = 2;
 
-        ApduCommand.Body body = new ApduCommand.Body(data, null, false);
+        ApduCommand.Body body = new ApduCommand.Body(data, (Integer) null, false);
         int actualSize = body.size();
         assertEquals(expectedSize, actualSize);
 

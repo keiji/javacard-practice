@@ -69,6 +69,21 @@ public class ApduCommand {
         }
 
         /**
+         * Constructor.
+         *
+         * @param cla Class of instruction
+         * @param ins Instruction code
+         * @param p1  Instruction parameter 1
+         * @param p2  Instruction parameter 2
+         */
+        public Header(byte cla, byte ins, byte p1, byte p2) {
+            this.cla = cla;
+            this.ins = ins;
+            this.p1 = p1;
+            this.p2 = p2;
+        }
+
+        /**
          * Number of bytes of the header.
          *
          * @return Returns the number of bytes of the header
@@ -137,6 +152,13 @@ public class ApduCommand {
         public final byte[] lc;
 
         /**
+         * Get number of bytes present in the data field of the command.
+         */
+        public Integer getLc() {
+            return Utils.convertLcOrLeBytesToInt(lc);
+        }
+
+        /**
          * String of bytes sent in the data field of the command.
          */
         public final byte[] data;
@@ -146,10 +168,28 @@ public class ApduCommand {
          */
         public final byte[] le;
 
+        /**
+         * Get maximum number of bytes expected in the data field of the response to the command.
+         */
+        public Integer getLe() {
+            return Utils.convertLcOrLeBytesToInt(le);
+        }
+
         private Body(byte[] lc, byte[] data, byte[] le) {
             this.lc = lc;
             this.data = data;
             this.le = le;
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param data                String of bytes sent in the data field of the command
+         * @param le                  Maximum number of bytes expected in the data field of the response to the command
+         * @param enableExtendedField Whether the APDU supports extended length
+         */
+        public Body(byte[] data, byte[] le, boolean enableExtendedField) {
+            this(data, Utils.convertLcOrLeBytesToInt(le), enableExtendedField);
         }
 
         /**
@@ -303,7 +343,7 @@ public class ApduCommand {
      * @param header Mandatory header
      * @param body   Conditional body
      */
-    ApduCommand(Header header, Body body) {
+    public ApduCommand(Header header, Body body) {
         if (header == null) {
             throw new IllegalArgumentException("`header` must not be null.");
         }
@@ -462,7 +502,7 @@ public class ApduCommand {
     ) {
         return new ApduCommand(
                 new Header(cla, ins, p1, p2),
-                new Body(data, null, enableExtendedField)
+                new Body(data, (Integer) null, enableExtendedField)
         );
     }
 
