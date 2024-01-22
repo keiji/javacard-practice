@@ -13,14 +13,14 @@ Download
 
 ```
 dependencies {
-    implementation("dev.keiji.apdu:apdu:0.9.1")
+    implementation("dev.keiji.apdu:apdu:0.9.2")
 }
 ```
 
 ## License
 
 ```
-Copyright 2022-2023 ARIYAMA Keiji
+Copyright 2022-2024 ARIYAMA Keiji
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
