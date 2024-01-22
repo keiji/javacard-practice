@@ -3,7 +3,7 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
       <module name="JavaCardPractice.apdu-android" target="11" />
-      <module name="JavaCardPractice.app" target="15" />
+      <module name="JavaCardPractice.app" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
