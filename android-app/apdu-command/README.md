@@ -7,7 +7,7 @@ Download
 
 ```
 dependencies {
-    implementation("dev.keiji.apdu:apdu-command:0.9.2")
+    implementation("dev.keiji.apdu:apdu-command:0.9.3")
 }
 ```
 
