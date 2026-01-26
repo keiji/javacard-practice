@@ -6,11 +6,13 @@ on:
     paths:
       - '.github/workflows/**'
       - 'android-app/**'
+      - 'library/**'
   pull_request:
     branches: [ "main" ]
     paths:
       - '.github/workflows/**'
       - 'android-app/**'
+      - 'library/**'
 jobs:
   build:
 
@@ -23,6 +25,8 @@ jobs:
         path: |
           ~/android-app/.gradle/caches
           ~/android-app/.gradle/wrapper
+          ~/library/.gradle/caches
+          ~/library/.gradle/wrapper
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
@@ -33,12 +37,26 @@ jobs:
         distribution: 'zulu'
         cache: gradle
 
-    - name: Grant execute permission for gradlew
+    - name: Grant execute permission for gradlew (library)
+      run: chmod +x gradlew
+      working-directory: ./library
+
+    - name: Grant execute permission for gradlew (android-app)
       run: chmod +x gradlew
       working-directory: ./android-app
-    - name: Build
+
+    - name: APDU library Build
+      run: ./gradlew assemble
+      working-directory: ./library
+
+    - name: APDU library Test
+      run: ./gradlew test
+      working-directory: ./library
+
+    - name: Android Build
       run: ./gradlew assemble
       working-directory: ./android-app
-    - name: Execute unit-test
+
+    - name: Android Test
       run: ./gradlew test
       working-directory: ./android-app
