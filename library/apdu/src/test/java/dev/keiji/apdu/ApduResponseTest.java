@@ -2,6 +2,7 @@ package dev.keiji.apdu;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
@@ -81,5 +82,53 @@ public class ApduResponseTest {
         } catch (IllegalArgumentException exception) {
             System.out.println(exception);
         }
+    }
+
+    @Test
+    public void testConstructors() {
+        ApduResponse response1 = new ApduResponse(0x90, 0x00);
+        assertEquals(0x90, response1.getStatusWord1());
+        assertEquals(0x00, response1.getStatusWord2());
+        assertEquals(0, response1.getData().length);
+
+        byte[] data = new byte[]{0x01, 0x02, 0x03};
+        ApduResponse response2 = new ApduResponse(0x90, 0x00, data);
+        assertEquals(0x90, response2.getStatusWord1());
+        assertEquals(0x00, response2.getStatusWord2());
+        assertArrayEquals(data, response2.getData());
+    }
+
+    @Test
+    public void testGetBytes() {
+        byte[] data = new byte[]{0x01, 0x02};
+        ApduResponse response = new ApduResponse(0x90, 0x00, data);
+        byte[] expected = new byte[]{0x01, 0x02, (byte) 0x90, 0x00};
+        assertArrayEquals(expected, response.getBytes());
+    }
+
+    @Test
+    public void testWriteTo() {
+        byte[] data = new byte[]{0x01, 0x02};
+        ApduResponse response = new ApduResponse(0x90, 0x00, data);
+        byte[] buffer = new byte[4];
+        response.writeTo(buffer);
+        byte[] expected = new byte[]{0x01, 0x02, (byte) 0x90, 0x00};
+        assertArrayEquals(expected, buffer);
+    }
+
+    @Test
+    public void testEqualsAndHashCode() {
+        ApduResponse response1 = new ApduResponse(0x90, 0x00, new byte[]{0x01});
+        ApduResponse response2 = new ApduResponse(0x90, 0x00, new byte[]{0x01});
+        ApduResponse response3 = new ApduResponse(0x61, 0x00, new byte[]{0x01});
+        ApduResponse response4 = new ApduResponse(0x90, 0x00, new byte[]{0x02});
+
+        assertEquals(response1, response2);
+        assertEquals(response1.hashCode(), response2.hashCode());
+
+        assertNotEquals(response1, response3);
+        assertNotEquals(response1, response4);
+        assertNotEquals(response1, new Object());
+        assertNotEquals(response1, null);
     }
 }

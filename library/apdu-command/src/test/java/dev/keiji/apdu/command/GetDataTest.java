@@ -128,4 +128,23 @@ public class GetDataTest {
             System.out.println(exception);
         }
     }
+
+    @Test
+    public void testConstructorWithIntP1P2() {
+        byte[] expected = new byte[]{
+                0x00, (byte) 0xCA, 0x01, 0x02, (byte) 0x00,
+        };
+
+        // GetData(int cla, int p1, int p2, int ne, boolean enableExtendedField)
+        GetData getData = new GetData(
+                0x00,
+                0x01,
+                0x02,
+                0x00,
+                false
+        );
+        byte[] actual = getData.getBytes();
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
 }
