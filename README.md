@@ -1,10 +1,26 @@
 JavaCard Practice
 ========
 
- * APDU for Java
-     * https://github.com/keiji/javacard-practice/tree/main/android-app/apdu
- * APDU Command helper for Java
-     * https://github.com/keiji/javacard-practice/tree/main/android-app/apdu-command
+This repository provides tools and libraries for JavaCard development, including APDU handling utilities.
+
+Library Overview
+========
+
+The core logic is separated into libraries located in the `library` directory.
+
+* **APDU for Java**
+    * Utilities for encoding the command of APDU and decoding the response representation of binary data.
+    * [library/apdu](library/apdu)
+* **APDU Command helper for Java**
+    * Helper classes for building APDU commands.
+    * [library/apdu-command](library/apdu-command)
+
+Modules
+========
+
+* [library](library): Contains the core APDU libraries.
+* [android-app](android-app): Android application demonstrating the usage of the libraries.
+* [javacard-applet](javacard-applet): Sample JavaCard applet.
 
 License
 ========
