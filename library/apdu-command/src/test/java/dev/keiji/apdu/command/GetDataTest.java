@@ -147,4 +147,19 @@ public class GetDataTest {
 
         Assertions.assertArrayEquals(expected, actual);
     }
+
+    @Test
+    public void testConstructor_Exception_NullTag() {
+        try {
+            new GetData(
+                    0x00,
+                    (byte[]) null,
+                    0x00,
+                    false
+            );
+            Assertions.fail();
+        } catch (IllegalArgumentException exception) {
+            Assertions.assertEquals("`tag` must not be null.", exception.getMessage());
+        }
+    }
 }

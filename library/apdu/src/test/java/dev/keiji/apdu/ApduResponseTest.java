@@ -131,4 +131,15 @@ public class ApduResponseTest {
         assertNotEquals(response1, new Object());
         assertNotEquals(response1, null);
     }
+
+    @Test
+    public void testConstructor_Exception_NullData() {
+        try {
+            new ApduResponse(0x90, 0x00, null);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`data` must not be null.", exception.getMessage());
+        }
+    }
 }

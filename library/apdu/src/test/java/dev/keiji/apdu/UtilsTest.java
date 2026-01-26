@@ -264,4 +264,16 @@ public class UtilsTest {
             System.out.println(exception);
         }
     }
+
+    @Test
+    public void readByteArrayForLcOrLeTest_Exception5() {
+        byte[] byteArray = new byte[] {0x00, 0x01}; // starts with 0x00, implies 3 bytes, but only has 2
+        try {
+            byte[] actual = Utils.readByteArrayForLcOrLe(byteArray, 0);
+            fail();
+        } catch(IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`byteArray` length must be greater than 2", exception.getMessage());
+        }
+    }
 }

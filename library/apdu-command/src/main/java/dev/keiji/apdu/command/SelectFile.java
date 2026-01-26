@@ -113,6 +113,13 @@ public class SelectFile extends BaseCommand {
     public SelectFile(int cla, P1[] p1Array, P2[] p2Array, byte[] data, boolean enableExtendedField) {
         super(cla);
 
+        if (p1Array == null) {
+            throw new IllegalArgumentException("`p1Array` must not be null.");
+        }
+        if (p2Array == null) {
+            throw new IllegalArgumentException("`p2Array` must not be null.");
+        }
+
         int p1 = 0x00;
         for (P1 p : p1Array) {
             p1 |= p.value;

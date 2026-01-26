@@ -28,6 +28,10 @@ public class GetData extends BaseCommand {
     public GetData(int cla, byte[] tag, int ne, boolean enableExtendedField) {
         super(cla);
 
+        if (tag == null) {
+            throw new IllegalArgumentException("`tag` must not be null.");
+        }
+
         if (!(tag.length == 1 || tag.length == 2)) {
             throw new IllegalArgumentException("tag length must be 1 or 2.");
         }
