@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import dev.keiji.apdu.ApduResponse;
 
 public class BaseResponseTest {
-    private static class DummyResponse extends ApduResponse {
+    private static class DummyResponse extends BaseCommand.BaseResponse {
         public DummyResponse(byte[] rawData) {
             super(rawData);
         }
@@ -54,5 +54,18 @@ public class BaseResponseTest {
         Assertions.assertArrayEquals(new byte[]{0x00, 0x01, 0x02, 0x03, 0x04, 0x05}, response.getData());
         Assertions.assertEquals(0xFE, response.getStatusWord1());
         Assertions.assertEquals(0xFF, response.getStatusWord2());
+    }
+
+    @Test
+    public void testGetStatusWord() {
+        byte[] responseByte = new byte[]{ (byte) 0x90, 0x00 };
+        DummyResponse response = new DummyResponse(responseByte);
+        Assertions.assertEquals(0x9000, response.getStatusWord());
+    }
+
+    @Test
+    public void testStaticGetStatusWord() {
+        Assertions.assertEquals(0x9000, BaseCommand.BaseResponse.getStatusWord(0x90, 0x00));
+        Assertions.assertEquals(0x6110, BaseCommand.BaseResponse.getStatusWord(0x61, 0x10));
     }
 }

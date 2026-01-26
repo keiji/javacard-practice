@@ -2,6 +2,8 @@ package dev.keiji.apdu;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
@@ -381,5 +383,52 @@ public class ApduCommandTest {
         } catch (IllegalArgumentException exception) {
             System.out.println(exception);
         }
+    }
+
+    @Test
+    public void testEqualsAndHashCode() {
+        ApduCommand cmd1 = ApduCommand.createCase1(0x00, 0xA4, 0x00, 0x00);
+        ApduCommand cmd2 = ApduCommand.createCase1(0x00, 0xA4, 0x00, 0x00);
+        ApduCommand cmd3 = ApduCommand.createCase1(0x00, 0xA4, 0x04, 0x00);
+
+        assertEquals(cmd1, cmd2);
+        assertEquals(cmd1.hashCode(), cmd2.hashCode());
+
+        assertNotEquals(cmd1, cmd3);
+        assertNotEquals(cmd1, null);
+        assertNotEquals(cmd1, new Object());
+    }
+
+    @Test
+    public void testHeaderConstructorAndEquals() {
+        ApduCommand.Header header1 = new ApduCommand.Header((byte) 0x00, (byte) 0xA4, (byte) 0x00, (byte) 0x00);
+        ApduCommand.Header header2 = new ApduCommand.Header(0x00, 0xA4, 0x00, 0x00);
+
+        assertEquals(header1, header2);
+        assertEquals(header1.hashCode(), header2.hashCode());
+
+        ApduCommand.Header header3 = new ApduCommand.Header(0x00, 0xB0, 0x00, 0x00);
+        assertNotEquals(header1, header3);
+        assertNotEquals(header1, null);
+        assertNotEquals(header1, new Object());
+    }
+
+    @Test
+    public void testBodyGettersAndEquals() {
+        byte[] data = new byte[]{0x01, 0x02};
+        ApduCommand.Body body1 = new ApduCommand.Body(data, 0x00, false);
+        ApduCommand.Body body2 = new ApduCommand.Body(data, 0x00, false);
+
+        assertEquals(body1, body2);
+        assertEquals(body1.hashCode(), body2.hashCode());
+
+        assertNotNull(body1.getLc());
+        assertEquals(2, body1.getLc());
+        assertEquals(0, body1.getLe()); // le was 0x00
+
+        ApduCommand.Body body3 = new ApduCommand.Body(data, 0x01, false);
+        assertNotEquals(body1, body3);
+        assertNotEquals(body1, null);
+        assertNotEquals(body1, new Object());
     }
 }
