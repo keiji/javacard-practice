@@ -18,7 +18,16 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
-// 29p of https://gnupg.org/ftp/specs/OpenPGP-smart-card-application-2.2.pdf
+/**
+ * Compute Digital Signature command (INS=0x2A).
+ * <p>
+ * This command initiates the computation of a digital signature on the card
+ * using the private key specified by the Security Environment.
+ * </p>
+ * <p>
+ * See: 29p of https://gnupg.org/ftp/specs/OpenPGP-smart-card-application-2.2.pdf
+ * </p>
+ */
 public class ComputeDigitalSignature extends BaseCommand {
     private static final int INS = 0x2A;
     private static final int P1 = 0x9E;
@@ -26,6 +35,14 @@ public class ComputeDigitalSignature extends BaseCommand {
 
     private final ApduCommand apduCommand;
 
+    /**
+     * Constructor.
+     *
+     * @param cla                 Class of instruction.
+     * @param data                Data to be signed (typically the hash of the message).
+     * @param enableExtendedField Whether to use extended length APDU.
+     * @throws IllegalArgumentException If `data` is null or empty.
+     */
     public ComputeDigitalSignature(int cla, byte[] data, boolean enableExtendedField) {
         super(cla);
 
@@ -50,8 +67,16 @@ public class ComputeDigitalSignature extends BaseCommand {
         return apduCommand.getBytes();
     }
 
+    /**
+     * Response for ComputeDigitalSignature command.
+     */
     public static class Response extends BaseResponse {
 
+        /**
+         * Constructor.
+         *
+         * @param rawData Raw response data.
+         */
         public Response(byte[] rawData) {
             super(rawData);
         }

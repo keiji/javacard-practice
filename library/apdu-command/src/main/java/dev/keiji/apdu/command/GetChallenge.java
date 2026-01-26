@@ -18,6 +18,13 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
+/**
+ * Get Challenge command (INS=0xB4).
+ * <p>
+ * This command requests the card to issue a challenge (random number) for use in
+ * security related procedures (e.g., external authentication).
+ * </p>
+ */
 public class GetChallenge extends BaseCommand {
     private static final int INS = 0xB4;
     private static final int P1 = 0x00;
@@ -25,6 +32,13 @@ public class GetChallenge extends BaseCommand {
 
     private final ApduCommand apduCommand;
 
+    /**
+     * Constructor.
+     *
+     * @param cla           Class of instruction.
+     * @param requestLength Length of the challenge to be generated.
+     * @throws IllegalArgumentException If `requestLength` is less than or equal to 0.
+     */
     public GetChallenge(int cla, int requestLength) {
         super(cla);
 
@@ -44,8 +58,16 @@ public class GetChallenge extends BaseCommand {
         return apduCommand.getBytes();
     }
 
+    /**
+     * Response for GetChallenge command.
+     */
     public static class Response extends BaseResponse {
 
+        /**
+         * Constructor.
+         *
+         * @param rawData Raw response data.
+         */
         public Response(byte[] rawData) {
             super(rawData);
         }

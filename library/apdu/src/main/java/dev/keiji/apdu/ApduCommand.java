@@ -21,11 +21,18 @@ import java.util.Objects;
 
 /**
  * Command APDU.
+ * <p>
+ * Represents an APDU (Application Protocol Data Unit) command structure as defined in ISO/IEC 7816-4.
+ * An APDU command consists of a mandatory header and an optional body.
+ * </p>
  */
 public class ApduCommand {
 
     /**
      * Mandatory header.
+     * <p>
+     * The header consists of 4 bytes: Class (CLA), Instruction (INS), Parameter 1 (P1), and Parameter 2 (P2).
+     * </p>
      */
     public static class Header {
 
@@ -97,6 +104,7 @@ public class ApduCommand {
          *
          * @param byteArray The ByteArray to which this object should output
          * @param offset    The offset within the array of the first byte to be write
+         * @throws IllegalArgumentException If `offset` is negative or `byteArray` is too small.
          */
         public void writeTo(byte[] byteArray, int offset) {
             if (offset < 0) {
@@ -114,6 +122,13 @@ public class ApduCommand {
             byteArray[offset + 3] = p2;
         }
 
+        /**
+         * Reads a Header from a byte array.
+         *
+         * @param byteArray The byte array containing the header data.
+         * @param offset    The offset to start reading from.
+         * @return A new Header instance.
+         */
         public static Header readFrom(byte[] byteArray, int offset) {
             return new Header(
                     byteArray[offset] & 0xFF,
@@ -139,6 +154,9 @@ public class ApduCommand {
 
     /**
      * Conditional body.
+     * <p>
+     * The body can contain the length of data (Lc), the data field, and the maximum expected response length (Le).
+     * </p>
      */
     public static class Body {
         private static final int MAX_LC_LENGTH = 0x000000FF;
@@ -153,6 +171,8 @@ public class ApduCommand {
 
         /**
          * Get number of bytes present in the data field of the command.
+         *
+         * @return The length of the data field (Lc) as an integer.
          */
         public Integer getLc() {
             return Utils.convertLcOrLeBytesToInt(lc);
@@ -170,6 +190,8 @@ public class ApduCommand {
 
         /**
          * Get maximum number of bytes expected in the data field of the response to the command.
+         *
+         * @return The maximum expected response length (Le) as an integer.
          */
         public Integer getLe() {
             return Utils.convertLcOrLeBytesToInt(le);
@@ -187,6 +209,7 @@ public class ApduCommand {
          * @param data                String of bytes sent in the data field of the command
          * @param le                  Maximum number of bytes expected in the data field of the response to the command
          * @param enableExtendedField Whether the APDU supports extended length
+         * @throws IllegalArgumentException If data length or Le exceeds allowed limits for standard/extended fields.
          */
         public Body(byte[] data, byte[] le, boolean enableExtendedField) {
             this(data, Utils.convertLcOrLeBytesToInt(le), enableExtendedField);
@@ -198,6 +221,7 @@ public class ApduCommand {
          * @param data                String of bytes sent in the data field of the command
          * @param le                  Maximum number of bytes expected in the data field of the response to the command
          * @param enableExtendedField Whether the APDU supports extended length
+         * @throws IllegalArgumentException If `data` and `le` are both null, or if lengths exceed allowed limits.
          */
         public Body(byte[] data, Integer le, boolean enableExtendedField) {
             if (data == null && le == null) {
@@ -251,6 +275,7 @@ public class ApduCommand {
          *
          * @param byteArray The ByteArray to which this object should output
          * @param offset    The offset within the array of the first byte to be write
+         * @throws IllegalArgumentException If `offset` is negative or `byteArray` is too small.
          */
         public void writeTo(byte[] byteArray, int offset) {
             if (offset < 0) {
@@ -277,6 +302,14 @@ public class ApduCommand {
             }
         }
 
+        /**
+         * Reads a Body from a byte array.
+         *
+         * @param byteArray The byte array containing the APDU body.
+         * @param offset    The offset to start reading from (usually after the header).
+         * @return A new Body instance.
+         * @throws IllegalArgumentException If the byte array doesn't contain enough data specified by Lc.
+         */
         public static Body readFrom(byte[] byteArray, int offset) {
             byte[] lcOrLeBytes = Utils.readByteArrayForLcOrLe(byteArray, offset);
             int lcOrLeValue = Utils.convertLcOrLeBytesToInt(lcOrLeBytes);
@@ -346,6 +379,7 @@ public class ApduCommand {
      *
      * @param header Mandatory header
      * @param body   Conditional body
+     * @throws IllegalArgumentException If `header` is null.
      */
     public ApduCommand(Header header, Body body) {
         if (header == null) {
@@ -380,6 +414,14 @@ public class ApduCommand {
         return byteArray;
     }
 
+    /**
+     * Reads an APDU command from a byte array.
+     *
+     * @param byteArray The source byte array.
+     * @param offset    The offset to start reading from.
+     * @return An ApduCommand instance.
+     * @throws IllegalArgumentException If `byteArray` is null, offset is negative, or data is insufficient.
+     */
     public static ApduCommand readFrom(byte[] byteArray, int offset) {
         if (byteArray == null) {
             throw new IllegalArgumentException("`byteArray` must not be null.");
@@ -406,6 +448,7 @@ public class ApduCommand {
      * Write this APDU command to the given ByteArray.
      *
      * @param byteArray The ByteArray to which this object should output
+     * @throws IllegalArgumentException If the byte array is too small.
      */
     public void writeTo(byte[] byteArray) {
         writeTo(byteArray, 0);
@@ -416,6 +459,7 @@ public class ApduCommand {
      *
      * @param byteArray The ByteArray to which this object should output
      * @param offset    The offset within the array of the first byte to be write
+     * @throws IllegalArgumentException If `offset` is negative or `byteArray` is too small.
      */
     public void writeTo(byte[] byteArray, int offset) {
         if (offset < 0) {

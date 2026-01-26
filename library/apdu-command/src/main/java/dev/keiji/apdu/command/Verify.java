@@ -18,13 +18,31 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
+/**
+ * Verify command (INS=0x20).
+ * <p>
+ * This command initiates the comparison of the verification data sent in the command data field
+ * with the reference data stored in the card (e.g., PIN verification).
+ * </p>
+ */
 public class Verify extends BaseCommand {
     private static final int INS = 0x20;
     private static final int P1 = 0x00;
 
+    /**
+     * Parameter 2 (P2) - Reference Data Qualifier.
+     */
     public static class P2 {
+        /**
+         * The P2 value.
+         */
         public final int value;
 
+        /**
+         * Constructor.
+         *
+         * @param value The P2 value.
+         */
         public P2(int value) {
             this.value = value;
         }
@@ -50,10 +68,27 @@ public class Verify extends BaseCommand {
 
     private final ApduCommand apduCommand;
 
+    /**
+     * Constructor for verifying verification data.
+     *
+     * @param cla  Class of instruction.
+     * @param p2   P2 parameter indicating the scope of the reference data (Global/Specific).
+     * @param data The verification data (e.g., PIN).
+     * @throws IllegalArgumentException If `p2` is null or `data` is empty.
+     */
     public Verify(int cla, P2 p2, byte[] data) {
         this(cla, p2, data, null);
     }
 
+    /**
+     * Constructor for verifying verification data with a specific reference data number.
+     *
+     * @param cla                 Class of instruction.
+     * @param p2                  P2 parameter.
+     * @param data                The verification data.
+     * @param referenceDataNumber Qualifier for the reference data (5 bits), if applicable.
+     * @throws IllegalArgumentException If `p2` is null, `data` is empty, or `referenceDataNumber` is invalid (not 0-31).
+     */
     public Verify(int cla, P2 p2, byte[] data, Integer referenceDataNumber) {
         super(cla);
 
@@ -98,8 +133,16 @@ public class Verify extends BaseCommand {
         return apduCommand.getBytes();
     }
 
+    /**
+     * Response for Verify command.
+     */
     public static class Response extends BaseResponse {
 
+        /**
+         * Constructor.
+         *
+         * @param rawData Raw response data.
+         */
         public Response(byte[] rawData) {
             super(rawData);
         }

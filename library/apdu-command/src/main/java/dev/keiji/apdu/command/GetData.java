@@ -18,6 +18,13 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
+/**
+ * Get Data command (INS=0xCA).
+ * <p>
+ * This command is used to retrieve a specific data object from the card,
+ * identified by a tag (P1-P2).
+ * </p>
+ */
 public class GetData extends BaseCommand {
     private static final int INS = 0xCA;
 
@@ -25,6 +32,15 @@ public class GetData extends BaseCommand {
 
     private final ApduCommand apduCommand;
 
+    /**
+     * Constructor using tag byte array.
+     *
+     * @param cla                 Class of instruction.
+     * @param tag                 Tag bytes identifying the data object (1 or 2 bytes).
+     * @param ne                  Maximum number of bytes expected in the response (Le).
+     * @param enableExtendedField Whether to use extended length APDU.
+     * @throws IllegalArgumentException If `tag` is null or not 1 or 2 bytes long.
+     */
     public GetData(int cla, byte[] tag, int ne, boolean enableExtendedField) {
         super(cla);
 
@@ -49,6 +65,15 @@ public class GetData extends BaseCommand {
         apduCommand = ApduCommand.createCase2(cla, INS, p1, p2, ne, enableExtendedField);
     }
 
+    /**
+     * Constructor using explicit P1 and P2.
+     *
+     * @param cla                 Class of instruction.
+     * @param p1                  Parameter 1 (High byte of tag).
+     * @param p2                  Parameter 2 (Low byte of tag).
+     * @param ne                  Maximum number of bytes expected in the response (Le).
+     * @param enableExtendedField Whether to use extended length APDU.
+     */
     public GetData(int cla, int p1, int p2, int ne, boolean enableExtendedField) {
         super(cla);
 
@@ -60,8 +85,16 @@ public class GetData extends BaseCommand {
         return apduCommand.getBytes();
     }
 
+    /**
+     * Response for GetData command.
+     */
     public static class Response extends BaseResponse {
 
+        /**
+         * Constructor.
+         *
+         * @param rawData Raw response data.
+         */
         public Response(byte[] rawData) {
             super(rawData);
         }
