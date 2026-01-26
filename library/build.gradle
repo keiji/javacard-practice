@@ -13,3 +13,23 @@ ext {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+subprojects {
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion = "0.8.12"
+    }
+
+    tasks.withType(Test) {
+        finalizedBy 'jacocoTestReport'
+    }
+
+    tasks.withType(JacocoReport) {
+        dependsOn tasks.withType(Test)
+        reports {
+            xml.required = true
+            html.required = true
+        }
+    }
+}
