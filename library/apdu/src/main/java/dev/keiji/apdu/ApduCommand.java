@@ -293,6 +293,10 @@ public class ApduCommand {
                 );
             }
 
+            if (byteArray.length < offset + lcOrLeValue) {
+                throw new IllegalArgumentException("`byteArray` length must be greater or equal " + (offset + lcOrLeValue));
+            }
+
             byte[] data = new byte[lcOrLeValue];
             System.arraycopy(byteArray, offset, data, 0, lcOrLeValue);
 

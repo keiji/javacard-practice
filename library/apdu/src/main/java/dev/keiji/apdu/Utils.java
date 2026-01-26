@@ -81,12 +81,16 @@ final class Utils {
             throw new IllegalArgumentException("`offset` value must be greater or equal 0.");
         }
         if (byteArray.length <= offset) {
-            throw new IllegalArgumentException("`byteArray` must be greater or equal " + (byteArray.length + offset));
+            throw new IllegalArgumentException("`byteArray` length must be greater than " + offset);
         }
 
         byte byte1st = byteArray[offset];
         boolean hasMoreByte = byteArray.length > (offset + 1);
         if (byte1st == 0x00 && hasMoreByte) {
+            if (byteArray.length <= (offset + 2)) {
+                throw new IllegalArgumentException("`byteArray` length must be greater than " + (offset + 2));
+            }
+
             byte[] bytes = new byte[3];
             bytes[1] = byteArray[offset + 1];
             bytes[2] = byteArray[offset + 2];

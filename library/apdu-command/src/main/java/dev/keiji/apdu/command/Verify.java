@@ -57,6 +57,10 @@ public class Verify extends BaseCommand {
     public Verify(int cla, P2 p2, byte[] data, Integer referenceDataNumber) {
         super(cla);
 
+        if (p2 == null) {
+            throw new IllegalArgumentException("`p2` must not be null.");
+        }
+
         if (data != null && data.length == 0) {
             throw new IllegalArgumentException("data length must not be 0.");
         }

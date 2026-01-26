@@ -129,6 +129,10 @@ public class ApduResponse {
      * @param data        String of bytes received in the data field of the response
      */
     public ApduResponse(int statusWord1, int statusWord2, byte[] data) {
+        if (data == null) {
+            throw new IllegalArgumentException("`data` must not be null.");
+        }
+
         this.statusWord1 = statusWord1;
         this.statusWord2 = statusWord2;
         this.data = data;

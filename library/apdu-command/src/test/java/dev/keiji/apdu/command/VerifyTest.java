@@ -145,4 +145,18 @@ public class VerifyTest {
             System.out.println(exception);
         }
     }
+
+    @Test
+    public void testConstructor_Exception_NullP2() {
+        try {
+            new Verify(
+                    0x00,
+                    null,
+                    null
+            );
+            Assertions.fail();
+        } catch (IllegalArgumentException exception) {
+            Assertions.assertEquals("`p2` must not be null.", exception.getMessage());
+        }
+    }
 }

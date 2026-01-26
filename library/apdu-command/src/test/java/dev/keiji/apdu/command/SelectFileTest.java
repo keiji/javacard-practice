@@ -123,4 +123,36 @@ public class SelectFileTest {
             System.out.println(exception);
         }
     }
+
+    @Test
+    public void testConstructor_Exception_NullP1Array() {
+        try {
+            new SelectFile(
+                    0x00,
+                    null,
+                    new SelectFile.P2[]{SelectFile.P2.FIRST_RECORD},
+                    null,
+                    false
+            );
+            Assertions.fail();
+        } catch (IllegalArgumentException exception) {
+            Assertions.assertEquals("`p1Array` must not be null.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void testConstructor_Exception_NullP2Array() {
+        try {
+            new SelectFile(
+                    0x00,
+                    new SelectFile.P1[]{SelectFile.P1.SELECT_MF_DF_EF},
+                    null,
+                    null,
+                    false
+            );
+            Assertions.fail();
+        } catch (IllegalArgumentException exception) {
+            Assertions.assertEquals("`p2Array` must not be null.", exception.getMessage());
+        }
+    }
 }
