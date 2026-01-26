@@ -50,8 +50,24 @@ jobs:
       working-directory: ./library
 
     - name: APDU library Test
-      run: ./gradlew test
+      run: ./gradlew test jacocoTestReport
       working-directory: ./library
+
+    - name: Publish Test Report
+      uses: Madrapps/jacoco-report@v1.7.1
+      with:
+        paths: ${{ github.workspace }}/library/apdu/build/reports/jacoco/test/jacocoTestReport.xml,${{ github.workspace }}/library/apdu-command/build/reports/jacoco/test/jacocoTestReport.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
+        title: Library Coverage Report (See Artifacts for details)
+        update-comment: true
+
+    - name: Upload Test Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: jacoco-report
+        path: |
+          library/apdu/build/reports/jacoco/test/html/
+          library/apdu-command/build/reports/jacoco/test/html/
 
     - name: Android Build
       run: ./gradlew assemble
