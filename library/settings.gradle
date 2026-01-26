@@ -10,10 +10,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://s01.oss.sonatype.org/content/repositories/devkeijiapdu-1011" }
     }
 }
-rootProject.name = "JavaCardPractice"
-include ':app'
-includeBuild '../library'
+rootProject.name = "javacard-practice-library"
+include ':apdu'
+include ':apdu-command'
