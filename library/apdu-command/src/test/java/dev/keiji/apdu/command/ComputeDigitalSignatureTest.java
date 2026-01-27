@@ -109,4 +109,20 @@ public class ComputeDigitalSignatureTest {
             System.out.println(exception);
         }
     }
+
+    @Test
+    public void test1_exception_emptyData() {
+        byte[] emptyData = new byte[0];
+
+        try {
+            new ComputeDigitalSignature(
+                    0x00,
+                    emptyData,
+                    false
+            );
+            Assertions.fail();
+        } catch (IllegalArgumentException exception) {
+            Assertions.assertEquals("data length must not be 0.", exception.getMessage());
+        }
+    }
 }

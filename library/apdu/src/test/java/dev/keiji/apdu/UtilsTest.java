@@ -339,4 +339,59 @@ public class UtilsTest {
             assertEquals("`byteArray` length must be greater than 2", exception.getMessage());
         }
     }
+
+    @Test
+    public void readByteArrayForLeTest_Exception1() {
+        try {
+            Utils.readByteArrayForLe(null, 0, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`byteArray` must not be null.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void readByteArrayForLeTest_Exception2() {
+        try {
+            Utils.readByteArrayForLe(new byte[1], -1, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`offset` value must be greater or equal 0.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void convertIntToByteTest_Exception() {
+        try {
+            Utils.convertIntToByte(256);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`value` must be less or equals 1 byte.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void intToLcBytesTest_Exception() {
+        try {
+            Utils.intToLcBytes(65536, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`value` must be less or equals 65535", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void intToLeBytesTest_Exception() {
+        try {
+            Utils.intToLeBytes(65536, false, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`value` must be less or equals 65535", exception.getMessage());
+        }
+    }
 }

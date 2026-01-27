@@ -175,4 +175,28 @@ public class ApduCommandReadFromBytesTest {
             assertEquals("`byteArray` length must be greater or equal 7", exception.getMessage());
         }
     }
+
+    @Test
+    public void readFromBytes_Exception_TruncatedData_Extended() {
+        // Case 3e APDU: Header(4) + Lc(3) + Data(Lc).
+        // Lc = 256 (0x00 0x01 0x00)
+        // Expected Length = 4 + 3 + 256 = 263
+        byte[] truncatedApdu = new byte[4 + 3 + 255]; // 1 byte short
+        truncatedApdu[0] = 0x00;
+        truncatedApdu[1] = (byte) 0xA4;
+        truncatedApdu[2] = 0x04;
+        truncatedApdu[3] = 0x00;
+        // Extended Lc = 256
+        truncatedApdu[4] = 0x00;
+        truncatedApdu[5] = 0x01;
+        truncatedApdu[6] = 0x00;
+
+        try {
+            ApduCommand.readFrom(truncatedApdu, 0);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`byteArray` length must be greater or equal 263", exception.getMessage());
+        }
+    }
 }
