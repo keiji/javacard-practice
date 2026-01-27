@@ -159,4 +159,21 @@ public class VerifyTest {
             Assertions.assertEquals("`p2` must not be null.", exception.getMessage());
         }
     }
+
+    @Test
+    public void test4_exception_negativeReferenceDataNumber() {
+        byte[] data = new byte[16];
+
+        try {
+            new Verify(
+                    0x00,
+                    Verify.P2.SPECIFIC,
+                    data,
+                    -1
+            );
+            Assertions.fail();
+        } catch (IllegalArgumentException exception) {
+            Assertions.assertEquals("referenceDataNumber value must not be less than 0.", exception.getMessage());
+        }
+    }
 }
