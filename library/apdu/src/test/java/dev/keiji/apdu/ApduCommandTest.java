@@ -278,7 +278,7 @@ public class ApduCommandTest {
     @Test
     public void createCase4Test2() throws IOException {
         byte[] header = new byte[]{0x01, 0x02, 0x03, 0x04};
-        byte[] dataSize = new byte[]{0x00, 0x01, 0x00}; // 256
+        byte[] dataSize = new byte[]{(byte) 0x00, 0x01, 0x00}; // 256
         byte[] data = new byte[256];
         rand.nextBytes(data);
 
@@ -391,19 +391,27 @@ public class ApduCommandTest {
         ApduCommand cmd2 = ApduCommand.createCase1(0x00, 0xA4, 0x00, 0x00);
         ApduCommand cmd3 = ApduCommand.createCase1(0x00, 0xA4, 0x04, 0x00);
 
+        assertEquals(cmd1, cmd1);
         assertEquals(cmd1, cmd2);
         assertEquals(cmd1.hashCode(), cmd2.hashCode());
 
         assertNotEquals(cmd1, cmd3);
         assertNotEquals(cmd1, null);
         assertNotEquals(cmd1, new Object());
+
+        ApduCommand cmd4 = ApduCommand.createCase2(0x00, 0xA4, 0x00, 0x00, 0x10, false);
+        assertNotEquals(cmd1, cmd4);
+
+        ApduCommand cmd5 = ApduCommand.createCase2(0x00, 0xA4, 0x00, 0x00, 0x20, false);
+        assertNotEquals(cmd4, cmd5);
     }
 
     @Test
-    public void testHeaderConstructorAndEquals() {
+    public void testHeaderEqualsAndHashCode() {
         ApduCommand.Header header1 = new ApduCommand.Header((byte) 0x00, (byte) 0xA4, (byte) 0x00, (byte) 0x00);
         ApduCommand.Header header2 = new ApduCommand.Header(0x00, 0xA4, 0x00, 0x00);
 
+        assertEquals(header1, header1);
         assertEquals(header1, header2);
         assertEquals(header1.hashCode(), header2.hashCode());
 
@@ -414,11 +422,12 @@ public class ApduCommandTest {
     }
 
     @Test
-    public void testBodyGettersAndEquals() {
+    public void testBodyEqualsAndHashCode() {
         byte[] data = new byte[]{0x01, 0x02};
         ApduCommand.Body body1 = new ApduCommand.Body(data, 0x00, false);
-        ApduCommand.Body body2 = new ApduCommand.Body(data, 0x00, false);
+        ApduCommand.Body body2 = new ApduCommand.Body(data.clone(), 0x00, false);
 
+        assertEquals(body1, body1);
         assertEquals(body1, body2);
         assertEquals(body1.hashCode(), body2.hashCode());
 
@@ -430,5 +439,112 @@ public class ApduCommandTest {
         assertNotEquals(body1, body3);
         assertNotEquals(body1, null);
         assertNotEquals(body1, new Object());
+
+        ApduCommand.Body body4 = new ApduCommand.Body(null, 0x00, false);
+        ApduCommand.Body body5 = new ApduCommand.Body(null, 0x00, false);
+        assertEquals(body4, body5);
+        assertEquals(body4.hashCode(), body5.hashCode());
+        assertNotEquals(body1, body4);
+    }
+
+    @Test
+    public void writeToWithNegativeOffsetTest() {
+        ApduCommand apduCommand = ApduCommand.createCase1(0x00, 0xA4, 0x00, 0x00);
+        byte[] buffer = new byte[apduCommand.size()];
+
+        try {
+            apduCommand.writeTo(buffer, -1);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`offset` value must be greater or equal 0.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void constructorWithNullHeaderTest() {
+        try {
+            new ApduCommand(null, null);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`header` must not be null.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void createCase2WithNegativeLeTest() {
+        try {
+            // -1 (0xFFFFFFFF) has bits in upper 2 bytes set, so it should be detected as > 65535 or invalid bits.
+            // Utils.integerToByteArrayForLcOrLe checks MASK_INVALID_BYTES.
+            ApduCommand.createCase2(0x00, 0xA4, 0x00, 0x00, -1, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            // Message from Utils.integerToByteArrayForLcOrLe
+            assertEquals("`value` must be less or equals 65535", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void createCase4WithNegativeLeTest() {
+        byte[] data = new byte[]{0x01};
+        try {
+            ApduCommand.createCase4(0x00, 0xA4, 0x00, 0x00, data, -1, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`value` must be less or equals 65535", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void createCase3WithDataLength256AndExtendedFalse() {
+        byte[] data = new byte[256]; // Boundary + 1 for standard
+        rand.nextBytes(data);
+
+        try {
+            ApduCommand.createCase3(0x00, 0xA4, 0x00, 0x00, data, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`data` size must be less or equal than 255 bytes.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void createCase3WithDataLength65536AndExtendedTrue() {
+        byte[] data = new byte[65536]; // Boundary + 1 for extended
+        rand.nextBytes(data);
+
+        try {
+            ApduCommand.createCase3(0x00, 0xA4, 0x00, 0x00, data, true);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`data` size must be less or equal than 65535 bytes.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void createCase2WithLe256AndExtendedFalse() {
+        try {
+            ApduCommand.createCase2(0x00, 0xA4, 0x00, 0x00, 256, false);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`le` must be less or equal than 255 bytes.", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void createCase2WithLe65536AndExtendedTrue() {
+        try {
+            ApduCommand.createCase2(0x00, 0xA4, 0x00, 0x00, 65536, true);
+            fail();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception);
+            assertEquals("`le` must be less or equal than 65535 bytes.", exception.getMessage());
+        }
     }
 }
