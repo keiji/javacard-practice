@@ -155,4 +155,57 @@ public class SelectFileTest {
             Assertions.assertEquals("`p2Array` must not be null.", exception.getMessage());
         }
     }
+
+    @Test
+    public void testAutoExtendedBoundary255() throws IOException {
+        byte[] data = new byte[255]; // Standard max
+        for (int i = 0; i < data.length; i++) {
+            data[i] = (byte) i;
+        }
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(new byte[]{0x00, (byte) 0xA4, 0x04, 0x04});
+        expected.write(new byte[]{(byte) 0xFF}); // Lc = 255 (1 byte)
+        expected.write(data);
+
+        byte[] expectedByteArray = expected.toByteArray();
+
+        // Use constructor without enableExtendedField flag to test auto-detection
+        SelectFile selectFile = new SelectFile(
+                0x00,
+                new SelectFile.P1[]{SelectFile.P1.DIRECT_SELECTION_BY_DF_NAME},
+                new SelectFile.P2[]{SelectFile.P2.FIRST_RECORD, SelectFile.P2.RETURN_FCP_TEMPLATE},
+                data
+        );
+        byte[] actual = selectFile.getBytes();
+
+        Assertions.assertArrayEquals(expectedByteArray, actual);
+    }
+
+    @Test
+    public void testAutoExtendedBoundary256() throws IOException {
+        byte[] data = new byte[256]; // Extended start
+        for (int i = 0; i < data.length; i++) {
+            data[i] = (byte) i;
+        }
+
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        expected.write(new byte[]{0x00, (byte) 0xA4, 0x04, 0x04});
+        // Lc = 256 (Extended format: 0x00, 0x01, 0x00)
+        expected.write(new byte[]{0x00, 0x01, 0x00});
+        expected.write(data);
+
+        byte[] expectedByteArray = expected.toByteArray();
+
+        // Use constructor without enableExtendedField flag to test auto-detection
+        SelectFile selectFile = new SelectFile(
+                0x00,
+                new SelectFile.P1[]{SelectFile.P1.DIRECT_SELECTION_BY_DF_NAME},
+                new SelectFile.P2[]{SelectFile.P2.FIRST_RECORD, SelectFile.P2.RETURN_FCP_TEMPLATE},
+                data
+        );
+        byte[] actual = selectFile.getBytes();
+
+        Assertions.assertArrayEquals(expectedByteArray, actual);
+    }
 }

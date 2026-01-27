@@ -217,4 +217,66 @@ public class ApduBodyTest {
             System.out.println(exception);
         }
     }
+
+    @Test
+    public void createBodyTest_255_Extended() {
+        // Case 3e: Data=255 bytes. Extended=true.
+        // Lc should be 3 bytes (0x00, 0x00, 0xFF).
+        byte[] data = new byte[255];
+        rand.nextBytes(data);
+
+        byte[] expected = new byte[3 + 255];
+        expected[0] = 0x00;
+        expected[1] = 0x00;
+        expected[2] = (byte) 0xFF;
+        System.arraycopy(data, 0, expected, 3, 255);
+
+        ApduCommand.Body body = new ApduCommand.Body(data, (Integer) null, true);
+        assertEquals(expected.length, body.size());
+
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void createBodyTest_65535_Extended() {
+        // Case 3e: Data=65535 bytes. Extended=true.
+        // Lc should be 3 bytes (0x00, 0xFF, 0xFF).
+        byte[] data = new byte[65535];
+        rand.nextBytes(data);
+
+        byte[] expected = new byte[3 + 65535];
+        expected[0] = 0x00;
+        expected[1] = (byte) 0xFF;
+        expected[2] = (byte) 0xFF;
+        System.arraycopy(data, 0, expected, 3, 65535);
+
+        ApduCommand.Body body = new ApduCommand.Body(data, (Integer) null, true);
+        assertEquals(expected.length, body.size());
+
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void createBodyTest_0_Standard() {
+        // Case 3: Data=0 bytes. Extended=false.
+        // Lc should be 1 byte (0x00).
+        byte[] data = new byte[0];
+
+        byte[] expected = new byte[1];
+        expected[0] = 0x00;
+
+        ApduCommand.Body body = new ApduCommand.Body(data, (Integer) null, false);
+        assertEquals(expected.length, body.size());
+
+        byte[] actual = new byte[body.size()];
+        body.writeTo(actual, 0);
+
+        assertArrayEquals(expected, actual);
+    }
 }
