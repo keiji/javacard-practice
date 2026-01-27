@@ -228,9 +228,7 @@ public class ApduCommand {
                 throw new IllegalArgumentException("Either `data` or `le` must not be null.");
             }
 
-            boolean isExtended = enableExtendedField && (
-                    (data != null && data.length > MAX_LC_LENGTH)
-            );
+            boolean isExtended = enableExtendedField;
 
             if (data == null) {
                 this.data = null;
