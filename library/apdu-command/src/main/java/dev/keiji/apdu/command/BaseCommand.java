@@ -33,6 +33,11 @@ public abstract class BaseCommand {
     public final int cla;
 
     /**
+     * Maximum data length for standard APDU (255 bytes).
+     */
+    public static final int MAX_DATA_LENGTH_STANDARD = 255;
+
+    /**
      * Constructor.
      *
      * @param cla The Class (CLA) byte.

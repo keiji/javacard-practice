@@ -41,6 +41,18 @@ public class ReadBinary extends BaseCommand {
     /**
      * Constructor using 15-bit offset in P1-P2.
      *
+     * @param cla    Class of instruction.
+     * @param offset Offset within the file to start reading (0 to 32767).
+     * @param ne     Maximum number of bytes to read (Le).
+     * @throws IllegalArgumentException If `offset` is negative or exceeds 15 bits.
+     */
+    public ReadBinary(int cla, int offset, int ne) {
+        this(cla, offset, ne, ne > MAX_DATA_LENGTH_STANDARD);
+    }
+
+    /**
+     * Constructor using 15-bit offset in P1-P2.
+     *
      * @param cla                 Class of instruction.
      * @param offset              Offset within the file to start reading (0 to 32767).
      * @param ne                  Maximum number of bytes to read (Le).
@@ -60,6 +72,19 @@ public class ReadBinary extends BaseCommand {
         int p1 = (offset & MASK_2ND_BYTE) >>> 8;
         int p2 = (offset & MASK_1ST_BYTE);
         apduCommand = ApduCommand.createCase2(cla, INS, p1, p2, ne, enableExtendedField);
+    }
+
+    /**
+     * Constructor using Short EF Identifier in P1 and 8-bit offset in P2.
+     *
+     * @param cla               Class of instruction.
+     * @param shortEfIdentifier Short EF Identifier (0-31).
+     * @param offset            Offset within the file to start reading (0 to 255).
+     * @param ne                Maximum number of bytes to read (Le).
+     * @throws IllegalArgumentException If `offset` is invalid (negative or > 255), or `shortEfIdentifier` is invalid (negative or > 31).
+     */
+    public ReadBinary(int cla, int shortEfIdentifier, int offset, int ne) {
+        this(cla, shortEfIdentifier, offset, ne, ne > MAX_DATA_LENGTH_STANDARD);
     }
 
     /**
