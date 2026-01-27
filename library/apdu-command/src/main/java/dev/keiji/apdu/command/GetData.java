@@ -35,6 +35,18 @@ public class GetData extends BaseCommand {
     /**
      * Constructor using tag byte array.
      *
+     * @param cla Class of instruction.
+     * @param tag Tag bytes identifying the data object (1 or 2 bytes).
+     * @param ne  Maximum number of bytes expected in the response (Le).
+     * @throws IllegalArgumentException If `tag` is null or not 1 or 2 bytes long.
+     */
+    public GetData(int cla, byte[] tag, int ne) {
+        this(cla, tag, ne, ne > MAX_DATA_LENGTH_STANDARD);
+    }
+
+    /**
+     * Constructor using tag byte array.
+     *
      * @param cla                 Class of instruction.
      * @param tag                 Tag bytes identifying the data object (1 or 2 bytes).
      * @param ne                  Maximum number of bytes expected in the response (Le).
@@ -63,6 +75,18 @@ public class GetData extends BaseCommand {
         }
 
         apduCommand = ApduCommand.createCase2(cla, INS, p1, p2, ne, enableExtendedField);
+    }
+
+    /**
+     * Constructor using explicit P1 and P2.
+     *
+     * @param cla Class of instruction.
+     * @param p1  Parameter 1 (High byte of tag).
+     * @param p2  Parameter 2 (Low byte of tag).
+     * @param ne  Maximum number of bytes expected in the response (Le).
+     */
+    public GetData(int cla, int p1, int p2, int ne) {
+        this(cla, p1, p2, ne, ne > MAX_DATA_LENGTH_STANDARD);
     }
 
     /**

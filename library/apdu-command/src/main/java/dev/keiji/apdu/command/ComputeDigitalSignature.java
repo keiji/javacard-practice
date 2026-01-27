@@ -38,6 +38,17 @@ public class ComputeDigitalSignature extends BaseCommand {
     /**
      * Constructor.
      *
+     * @param cla  Class of instruction.
+     * @param data Data to be signed (typically the hash of the message).
+     * @throws IllegalArgumentException If `data` is null or empty.
+     */
+    public ComputeDigitalSignature(int cla, byte[] data) {
+        this(cla, data, data != null && data.length > MAX_DATA_LENGTH_STANDARD);
+    }
+
+    /**
+     * Constructor.
+     *
      * @param cla                 Class of instruction.
      * @param data                Data to be signed (typically the hash of the message).
      * @param enableExtendedField Whether to use extended length APDU.

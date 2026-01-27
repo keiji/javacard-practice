@@ -141,6 +141,19 @@ public class SelectFile extends BaseCommand {
     /**
      * Constructor.
      *
+     * @param cla     Class of instruction
+     * @param p1Array Array of P1 parameters to be OR'ed together.
+     * @param p2Array Array of P2 parameters to be OR'ed together.
+     * @param data    Data field (e.g., File ID, DF Name, Path).
+     * @throws IllegalArgumentException If `p1Array` or `p2Array` is null.
+     */
+    public SelectFile(int cla, P1[] p1Array, P2[] p2Array, byte[] data) {
+        this(cla, p1Array, p2Array, data, data != null && data.length > MAX_DATA_LENGTH_STANDARD);
+    }
+
+    /**
+     * Constructor.
+     *
      * @param cla                 Class of instruction
      * @param p1Array             Array of P1 parameters to be OR'ed together.
      * @param p2Array             Array of P2 parameters to be OR'ed together.
