@@ -72,7 +72,8 @@ public class ComputeDigitalSignatureTest {
         byte[] header = new byte[]{0x00, 0x2A, (byte) 0x9E, (byte) 0x9A};
         byte[] dataSize = new byte[]{0x00, (byte) 0xFF, (byte) 0xFF}; // 65,535
         byte[] data = new byte[0xFFFF];
-        byte[] ne = new byte[]{0x00};
+        // Case 4e: Le is 2 bytes for max length (0 -> 00 00)
+        byte[] ne = new byte[]{0x00, 0x00};
 
         rand.nextBytes(data);
 
