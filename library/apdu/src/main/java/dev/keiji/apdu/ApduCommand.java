@@ -220,7 +220,9 @@ public class ApduCommand {
          *
          * @param data                String of bytes sent in the data field of the command
          * @param le                  Maximum number of bytes expected in the data field of the response to the command
-         * @param enableExtendedField Whether the APDU supports extended length
+         * @param enableExtendedField Whether the APDU supports extended length.
+         *                            If true, the APDU is forced to use extended length encoding (3-byte Lc, 2-byte/3-byte Le).
+         *                            Automatic switching based on data length is NOT performed; if false and data exceeds 255 bytes, an exception is thrown.
          * @throws IllegalArgumentException If `data` and `le` are both null, or if lengths exceed allowed limits.
          */
         public Body(byte[] data, Integer le, boolean enableExtendedField) {
