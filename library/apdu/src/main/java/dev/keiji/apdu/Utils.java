@@ -66,7 +66,9 @@ final class Utils {
      * @param value The integer value to convert.
      * @return A byte array representing the value.
      * @throws IllegalArgumentException If the value is greater than 65535.
+     * @deprecated Use {@link #intToLcBytes(int, boolean)} or {@link #intToLeBytes(int, boolean, boolean)} instead.
      */
+    @Deprecated
     static byte[] integerToByteArrayForLcOrLe(int value) {
         if ((value & MASK_INVALID_BYTES) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
@@ -83,6 +85,105 @@ final class Utils {
             result[1] = (byte) ((value & MASK_2ND_BYTE) >> 8);
             result[2] = (byte) (value & MASK_1ST_BYTE);
             return result;
+        }
+    }
+
+    /**
+     * Converts an integer value to a byte array for Lc field.
+     *
+     * @param value         The integer value to convert.
+     * @param forceExtended Whether to force extended length encoding (3 bytes) even if value <= 255.
+     * @return A byte array representing the value.
+     */
+    static byte[] intToLcBytes(int value, boolean forceExtended) {
+        if ((value & MASK_INVALID_BYTES) != 0) {
+            throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
+        }
+
+        if (forceExtended || (value & MASK_GREATER_1BYTE) != 0) {
+            // Extended Lc is always 3 bytes: 00 XX XX
+            byte[] result = new byte[3];
+            // result[0] = 0x0;
+            result[1] = (byte) ((value & MASK_2ND_BYTE) >> 8);
+            result[2] = (byte) (value & MASK_1ST_BYTE);
+            return result;
+        } else {
+            // Short Lc: 1 byte
+            byte[] result = new byte[1];
+            result[0] = (byte) value;
+            return result;
+        }
+    }
+
+    /**
+     * Converts an integer value to a byte array for Le field.
+     *
+     * @param value         The integer value to convert.
+     * @param forceExtended Whether to force extended length encoding.
+     * @param hasData       Whether the APDU command has data (determines Case 4 vs Case 2 extended format).
+     * @return A byte array representing the value.
+     */
+    static byte[] intToLeBytes(int value, boolean forceExtended, boolean hasData) {
+        if ((value & MASK_INVALID_BYTES) != 0) {
+            throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
+        }
+
+        boolean isExtended = forceExtended || (value & MASK_GREATER_1BYTE) != 0;
+
+        if (isExtended) {
+            if (hasData) {
+                // Case 4e: Le is 2 bytes (XX XX) - No 00 prefix
+                byte[] result = new byte[2];
+                result[0] = (byte) ((value & MASK_2ND_BYTE) >> 8);
+                result[1] = (byte) (value & MASK_1ST_BYTE);
+                return result;
+            } else {
+                // Case 2e: Le is 3 bytes (00 XX XX)
+                byte[] result = new byte[3];
+                // result[0] = 0x0;
+                result[1] = (byte) ((value & MASK_2ND_BYTE) >> 8);
+                result[2] = (byte) (value & MASK_1ST_BYTE);
+                return result;
+            }
+        } else {
+            // Short Le: 1 byte
+            byte[] result = new byte[1];
+            result[0] = (byte) value;
+            return result;
+        }
+    }
+
+    /**
+     * Reads Le field bytes from the byte array.
+     *
+     * @param byteArray    The source byte array.
+     * @param offset       The offset to start reading from.
+     * @param isLcExtended Whether the Lc field was extended (determines Le format in Case 4).
+     * @return A byte array containing the Le bytes.
+     */
+    static byte[] readByteArrayForLe(byte[] byteArray, int offset, boolean isLcExtended) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("`byteArray` must not be null.");
+        }
+        if (offset < 0) {
+            throw new IllegalArgumentException("`offset` value must be greater or equal 0.");
+        }
+
+        if (isLcExtended) {
+            // Case 4e: Le is 2 bytes
+            if (byteArray.length < offset + 2) {
+                throw new IllegalArgumentException("`byteArray` length must be greater or equal " + (offset + 2));
+            }
+            byte[] le = new byte[2];
+            le[0] = byteArray[offset];
+            le[1] = byteArray[offset + 1];
+            return le;
+        } else {
+            // Case 4s: Le is 1 byte
+            if (byteArray.length <= offset) {
+                throw new IllegalArgumentException("`byteArray` length must be greater than " + offset);
+            }
+            return new byte[]{byteArray[offset]};
         }
     }
 

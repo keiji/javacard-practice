@@ -282,9 +282,10 @@ public class ApduCommandTest {
         byte[] data = new byte[256];
         rand.nextBytes(data);
 
-        byte[] le = new byte[]{(byte) 0x00, 0x01, 0x00}; // 256
+        // Case 4e: Le is 2 bytes. Value 256 (0x0100) -> 0x01 0x00
+        byte[] le = new byte[]{0x01, 0x00};
 
-        int expectedSize = 4 + 3 + 256 + 3;
+        int expectedSize = 4 + 3 + 256 + 2;
 
         ByteArrayOutputStream expected = new ByteArrayOutputStream();
         expected.write(header);
@@ -330,9 +331,10 @@ public class ApduCommandTest {
         byte[] data = new byte[256];
         rand.nextBytes(data);
 
-        byte[] le = new byte[]{(byte) 0x00, (byte) 0xFF, (byte) 0xFF}; // 65,535
+        // Case 4e: Le is 2 bytes. Value 65535 (0xFFFF) -> 0xFF 0xFF
+        byte[] le = new byte[]{(byte) 0xFF, (byte) 0xFF}; // 65,535
 
-        int expectedSize = 4 + 3 + 256 + 3;
+        int expectedSize = 4 + 3 + 256 + 2;
 
         ByteArrayOutputStream expected = new ByteArrayOutputStream();
         expected.write(header);

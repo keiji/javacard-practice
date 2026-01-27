@@ -228,6 +228,11 @@ public class ApduCommand {
                 throw new IllegalArgumentException("Either `data` or `le` must not be null.");
             }
 
+            boolean isExtended = enableExtendedField && (
+                    (data != null && data.length > MAX_LC_LENGTH)
+                            || (le != null && le > MAX_LE_LENGTH)
+            );
+
             if (data == null) {
                 this.data = null;
                 this.lc = null;
@@ -237,7 +242,7 @@ public class ApduCommand {
                 throw new IllegalArgumentException("`data` size must be less or equal than " + MAX_LC_EXTENDED_LENGTH + " bytes.");
             } else {
                 this.data = data;
-                this.lc = Utils.integerToByteArrayForLcOrLe(data.length);
+                this.lc = Utils.intToLcBytes(data.length, isExtended);
             }
 
             if (le == null) {
@@ -247,7 +252,7 @@ public class ApduCommand {
             } else if (enableExtendedField && le > MAX_LE_EXTENDED_LENGTH) {
                 throw new IllegalArgumentException("`le` must be less or equal than " + MAX_LE_EXTENDED_LENGTH + " bytes.");
             } else {
-                this.le = Utils.integerToByteArrayForLcOrLe(le);
+                this.le = Utils.intToLeBytes(le, isExtended, data != null);
             }
         }
 
@@ -313,11 +318,13 @@ public class ApduCommand {
         public static Body readFrom(byte[] byteArray, int offset) {
             byte[] lcOrLeBytes = Utils.readByteArrayForLcOrLe(byteArray, offset);
             int lcOrLeValue = Utils.convertLcOrLeBytesToInt(lcOrLeBytes);
+            boolean isLcExtended = lcOrLeBytes.length == 3;
 
             offset += lcOrLeBytes.length;
 
             boolean hasData = offset < byteArray.length;
 
+            // If there's no more data, it means the first field was Le (Case 2)
             if (!hasData) {
                 return new Body(
                         null,
@@ -326,6 +333,7 @@ public class ApduCommand {
                 );
             }
 
+            // Otherwise, the first field was Lc (Case 3 or Case 4)
             if (byteArray.length < offset + lcOrLeValue) {
                 throw new IllegalArgumentException("`byteArray` length must be greater or equal " + (offset + lcOrLeValue));
             }
@@ -337,7 +345,8 @@ public class ApduCommand {
 
             byte[] leBytes = null;
             if (offset < byteArray.length) {
-                leBytes = Utils.readByteArrayForLcOrLe(byteArray, offset);
+                // Remaining bytes are Le
+                leBytes = Utils.readByteArrayForLe(byteArray, offset, isLcExtended);
             }
 
             return new Body(

@@ -126,6 +126,69 @@ public class UtilsTest {
     }
 
     @Test
+    public void intToLcBytesTest1_Short() {
+        byte[] expected = new byte[] {0x0A};
+        byte[] actual = Utils.intToLcBytes(0x0A, false);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLcBytesTest2_Extended() {
+        byte[] expected = new byte[] {0x00, 0x01, 0x00};
+        byte[] actual = Utils.intToLcBytes(0x100, false);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLcBytesTest3_ForceExtended() {
+        byte[] expected = new byte[] {0x00, 0x00, 0x0A};
+        byte[] actual = Utils.intToLcBytes(0x0A, true);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLeBytesTest1_Short() {
+        byte[] expected = new byte[] {0x0A};
+        byte[] actual = Utils.intToLeBytes(0x0A, false, false);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLeBytesTest1_Short_Case4() {
+        byte[] expected = new byte[] {0x0A};
+        byte[] actual = Utils.intToLeBytes(0x0A, false, true);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLeBytesTest2_Case2e() {
+        byte[] expected = new byte[] {0x00, 0x01, 0x00};
+        byte[] actual = Utils.intToLeBytes(0x100, false, false); // Auto extended
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLeBytesTest3_Case4e() {
+        byte[] expected = new byte[] {0x01, 0x00};
+        byte[] actual = Utils.intToLeBytes(0x100, false, true); // Auto extended
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLeBytesTest4_ForceExtended_Case2e() {
+        byte[] expected = new byte[] {0x00, 0x00, 0x0A};
+        byte[] actual = Utils.intToLeBytes(0x0A, true, false);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void intToLeBytesTest5_ForceExtended_Case4e() {
+        byte[] expected = new byte[] {0x00, 0x0A};
+        byte[] actual = Utils.intToLeBytes(0x0A, true, true);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
     public void convertByteToIntTest1() {
         int expected = 0;
         byte value = 0;
