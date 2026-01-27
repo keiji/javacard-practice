@@ -186,14 +186,14 @@ public class ApduBodyTest {
     @Test
     public void createBodyTest6() {
         // Case 4e: Data=1 byte (Short range), Le=511 (Extended range).
-        // Since Le is extended, Lc must also be extended (3 bytes).
-        // Lc: 00 00 01
+        // Even if Le is extended, Lc uses Short because data fits in 255 bytes.
+        // Lc: 01
         // Data: 77
         // Le: 01 FF (2 bytes)
-        byte[] expected = new byte[]{0x00, 0x00, 0x01, 0x77, 0x01, (byte) 0xFF};
+        byte[] expected = new byte[]{0x01, 0x77, 0x01, (byte) 0xFF};
         byte[] data = new byte[]{0x77};
 
-        int expectedSize = 6;
+        int expectedSize = 4;
 
         ApduCommand.Body body = new ApduCommand.Body(data, 0x1FF, true);
         int actualSize = body.size();

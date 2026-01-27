@@ -230,7 +230,6 @@ public class ApduCommand {
 
             boolean isExtended = enableExtendedField && (
                     (data != null && data.length > MAX_LC_LENGTH)
-                            || (le != null && le > MAX_LE_LENGTH)
             );
 
             if (data == null) {
