@@ -21,6 +21,10 @@ import java.util.Objects;
 
 /**
  * Response APDU.
+ * <p>
+ * Represents the response from a smart card, consisting of an optional body (data)
+ * and a mandatory trailer (Status Word 1 and Status Word 2).
+ * </p>
  */
 public class ApduResponse {
 
@@ -81,6 +85,7 @@ public class ApduResponse {
      * Returns the byte array that this APDU response.
      *
      * @param byteArray The ByteArray to which this object should output
+     * @throws IllegalArgumentException If `byteArray` is too small.
      */
     public void writeTo(byte[] byteArray) {
         writeTo(byteArray, 0);
@@ -91,6 +96,7 @@ public class ApduResponse {
      *
      * @param byteArray The ByteArray to which this object should output
      * @param offset    The offset within the array of the first byte to be write
+     * @throws IllegalArgumentException If `offset` is negative or `byteArray` is too small to hold the response.
      */
     public void writeTo(byte[] byteArray, int offset) {
         if (offset < 0) {
@@ -127,6 +133,7 @@ public class ApduResponse {
      * @param statusWord1 Command processing status
      * @param statusWord2 Command processing qualifier
      * @param data        String of bytes received in the data field of the response
+     * @throws IllegalArgumentException If `data` is null.
      */
     public ApduResponse(int statusWord1, int statusWord2, byte[] data) {
         if (data == null) {
@@ -142,6 +149,7 @@ public class ApduResponse {
      * Constructor.
      *
      * @param rawData the rawData of APDU response
+     * @throws IllegalArgumentException If `rawData` is null or shorter than 2 bytes.
      */
     public ApduResponse(byte[] rawData) {
         if (rawData == null) {

@@ -16,6 +16,14 @@
 
 package dev.keiji.apdu;
 
+/**
+ * Utility class for APDU data manipulation.
+ * <p>
+ * This class provides methods to convert between integers and byte arrays,
+ * particularly for handling Lc (Length of Command) and Le (Length of Expected response) fields
+ * which have specific encoding rules (short vs extended length).
+ * </p>
+ */
 final class Utils {
     private static final int MASK_GREATER_1BYTE = 0xFFFFFF00;
     private static final int MASK_1ST_BYTE = 0x000000FF;
@@ -29,6 +37,17 @@ final class Utils {
     private Utils() {
     }
 
+    /**
+     * Calculates the size of the byte array required to represent the given Lc or Le value.
+     * <p>
+     * If the value is less than or equal to 255, it requires 1 byte.
+     * If the value is greater than 255, it requires 3 bytes (0x00 followed by 2 bytes of length).
+     * </p>
+     *
+     * @param value The integer value of Lc or Le.
+     * @return The size of the byte array (1 or 3).
+     * @throws IllegalArgumentException If the value is greater than 65535.
+     */
     static int calcByteArraySizeForLcOrLe(int value) {
         if ((value & MASK_INVALID_BYTES) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
@@ -41,6 +60,13 @@ final class Utils {
         }
     }
 
+    /**
+     * Converts an integer value to a byte array for Lc or Le fields.
+     *
+     * @param value The integer value to convert.
+     * @return A byte array representing the value.
+     * @throws IllegalArgumentException If the value is greater than 65535.
+     */
     static byte[] integerToByteArrayForLcOrLe(int value) {
         if ((value & MASK_INVALID_BYTES) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals " + MAX_LC_OR_LE_VALUE);
@@ -60,10 +86,23 @@ final class Utils {
         }
     }
 
+    /**
+     * Converts a byte to an unsigned integer.
+     *
+     * @param value The byte value.
+     * @return The unsigned integer representation.
+     */
     public static int convertByteToInt(byte value) {
         return ((int) value) & MASK_1ST_BYTE;
     }
 
+    /**
+     * Converts an integer to a byte, ensuring it fits in one byte.
+     *
+     * @param value The integer value.
+     * @return The byte representation.
+     * @throws IllegalArgumentException If the value is greater than 255 (0xFF).
+     */
     public static byte convertIntToByte(int value) {
         if ((value & MASK_GREATER_1BYTE) != 0) {
             throw new IllegalArgumentException("`value` must be less or equals 1 byte.");
@@ -73,6 +112,14 @@ final class Utils {
 
     }
 
+    /**
+     * Reads a byte array from a larger array that represents an Lc or Le field.
+     *
+     * @param byteArray The source byte array.
+     * @param offset    The offset to start reading from.
+     * @return A byte array containing the Lc or Le bytes.
+     * @throws IllegalArgumentException If `byteArray` is null, `offset` is negative, or `byteArray` is too short.
+     */
     public static byte[] readByteArrayForLcOrLe(byte[] byteArray, int offset) {
         if (byteArray == null) {
             throw new IllegalArgumentException("`byteArray` must not be null.");
@@ -100,6 +147,13 @@ final class Utils {
         }
     }
 
+    /**
+     * Converts a byte array representing Lc or Le into an integer.
+     *
+     * @param byteArray The byte array (length 1 or 3).
+     * @return The integer value.
+     * @throws IllegalArgumentException If `byteArray` is null, empty, or has an invalid length (not 1 or 3).
+     */
     public static int convertLcOrLeBytesToInt(byte[] byteArray) {
         if (byteArray == null) {
             throw new IllegalArgumentException("`byteArray` must not be null.");

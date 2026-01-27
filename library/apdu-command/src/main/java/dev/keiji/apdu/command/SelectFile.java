@@ -18,12 +18,29 @@ package dev.keiji.apdu.command;
 
 import dev.keiji.apdu.ApduCommand;
 
+/**
+ * Select File command (INS=0xA4).
+ * <p>
+ * This command selects a file (MF, DF, or EF) for subsequent operations.
+ * </p>
+ */
 public class SelectFile extends BaseCommand {
     private static final int INS = 0xA4;
 
+    /**
+     * Parameter 1 (P1) - Selection control.
+     */
     public static class P1 {
+        /**
+         * The P1 value.
+         */
         public final int value;
 
+        /**
+         * Constructor.
+         *
+         * @param value The P1 value.
+         */
         public P1(int value) {
             this.value = value;
         }
@@ -65,9 +82,20 @@ public class SelectFile extends BaseCommand {
 
     }
 
+    /**
+     * Parameter 2 (P2) - Selection control.
+     */
     public static class P2 {
+        /**
+         * The P2 value.
+         */
         public final int value;
 
+        /**
+         * Constructor.
+         *
+         * @param value The P2 value.
+         */
         public P2(int value) {
             this.value = value;
         }
@@ -110,6 +138,16 @@ public class SelectFile extends BaseCommand {
 
     private final ApduCommand apduCommand;
 
+    /**
+     * Constructor.
+     *
+     * @param cla                 Class of instruction
+     * @param p1Array             Array of P1 parameters to be OR'ed together.
+     * @param p2Array             Array of P2 parameters to be OR'ed together.
+     * @param data                Data field (e.g., File ID, DF Name, Path).
+     * @param enableExtendedField Whether to use extended length APDU.
+     * @throws IllegalArgumentException If `p1Array` or `p2Array` is null.
+     */
     public SelectFile(int cla, P1[] p1Array, P2[] p2Array, byte[] data, boolean enableExtendedField) {
         super(cla);
 
@@ -136,8 +174,16 @@ public class SelectFile extends BaseCommand {
         return apduCommand.getBytes();
     }
 
+    /**
+     * Response for SelectFile command.
+     */
     public static class Response extends BaseResponse {
 
+        /**
+         * Constructor.
+         *
+         * @param rawData Raw response data.
+         */
         public Response(byte[] rawData) {
             super(rawData);
         }
