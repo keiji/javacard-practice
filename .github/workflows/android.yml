@@ -54,7 +54,7 @@ jobs:
       working-directory: ./library
 
     - name: Publish Test Report
-      uses: Madrapps/jacoco-report@v1.7.1
+      uses: Madrapps/jacoco-report@v1.7.2
       with:
         paths: ${{ github.workspace }}/library/apdu/build/reports/jacoco/test/jacocoTestReport.xml,${{ github.workspace }}/library/apdu-command/build/reports/jacoco/test/jacocoTestReport.xml
         token: ${{ secrets.GITHUB_TOKEN }}
