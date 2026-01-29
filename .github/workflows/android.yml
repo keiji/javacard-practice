@@ -62,7 +62,7 @@ jobs:
         update-comment: true
 
     - name: Upload Test Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: jacoco-report
         path: |
